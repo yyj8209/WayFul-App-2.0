@@ -1,0 +1,1 @@
+include ':app', ':Amap_2DMap_V5.2.0_20170627', ':AMap_Search_V6.5.0_20180930'

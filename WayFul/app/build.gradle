@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenLocal()
+}
+
+android {
+    signingConfigs {
+    }
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
+    defaultConfig {
+        applicationId "com.dji.ImportSDKDemo"
+        minSdkVersion 23
+        targetSdkVersion 26
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dexOptions {
+        javaMaxHeapSize "3g"
+        preDexLibraries = false
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        aaptOptions.cruncherEnabled = false
+        aaptOptions.useNewCruncher = false
+    }
+    packagingOptions {
+        doNotStrip "*/*/libdjivideo.so"
+        doNotStrip "*/*/libSDKRelativeJNI.so"
+        doNotStrip "*/*/libFlyForbid.so"
+        doNotStrip "*/*/libduml_vision_bokeh.so"
+        doNotStrip "*/*/libyuv2.so"
+        doNotStrip "*/*/libGroudStation.so"
+        doNotStrip "*/*/libFRCorkscrew.so"
+        doNotStrip "*/*/libUpgradeVerify.so"
+        doNotStrip "*/*/libFR.so"
+        exclude 'META-INF/rxjava.properties'
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation 'com.dji:dji-uxsdk:4.5.1'
+    compileOnly 'com.dji:dji-sdk-provided:4.5.1'
+    implementation 'com.amap.api:map2d:5.2.0'
+    implementation 'com.amap.api:3dmap:5.5.0'
+    implementation 'com.amap.api:search:5.5.0'
+    implementation 'com.amap.api:location:3.6.1'
+    // 导航栏控件
+
+    implementation 'com.android.support:design:26.1.0'
+    implementation ('com.android.support:recyclerview-v7:26.1.0') {
+        exclude module: 'support-v4'
+    }
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    // 关系数据库
+    // https://github.com/LitePalFramework/LitePal
+    implementation 'org.litepal.android:java:3.0.0'
+}

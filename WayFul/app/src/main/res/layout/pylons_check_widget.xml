@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="visible">
+
+    <TextView
+        android:layout_width="120dp"
+        android:id="@+id/title"
+        android:layout_height="20dp"
+        android:text="当前挂架状态"
+        android:textSize="14dp"/>
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/title"
+        android:layout_marginTop="10dp"
+        android:id = "@+id/comm_test_up"
+        android:orientation="vertical"
+        android:columnCount="2"
+        android:rowCount="5">
+
+        <TextView
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="筒号  弹  型  状态"
+            android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare1"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="1号  催泪弹  就绪"
+            android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare2"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="2号  催泪弹  就绪"
+            android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare3"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="3号  催泪弹  就绪"
+            android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare4"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="4号  催泪弹  就绪"
+            android:textSize="14dp"/>
+        <TextView
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="筒号  弹  型  状态"
+            android:textSize="14dp"/>
+       <TextView
+            android:id="@+id/fire_prepare5"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="5号  催泪弹  就绪"
+           android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare6"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="6号  催泪弹  就绪"
+            android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare7"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="7号  催泪弹  就绪"
+            android:textSize="14dp"/>
+        <TextView
+            android:id="@+id/fire_prepare8"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:text="8号  催泪弹  就绪"
+            android:textSize="14dp"/>
+    </GridLayout>
+
+    <LinearLayout
+        android:id="@+id/YesNo"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_below="@id/comm_test_up"
+        android:background="@color/transparent"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="关闭"
+            android:textColor="?android:attr/colorAccent" />
+    </LinearLayout>
+
+</RelativeLayout>

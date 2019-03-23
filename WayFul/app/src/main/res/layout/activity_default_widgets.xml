@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:id="@+id/root_view"
+    tools:context="com.dji.ImportSDKDemo.CompleteWidgetActivity">
+
+    <!-- Widget to see first person view (FPV) -->
+    <dji.ux.widget.FPVWidget
+        android:id="@+id/fpv_widget"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+    <dji.ux.widget.FPVOverlayWidget
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <dji.ux.widget.MapWidget
+        android:id="@+id/map_widget"
+        android:layout_width="141dp"
+        android:layout_height="91dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp" />
+
+    <dji.ux.workflow.CompassCalibratingWorkFlow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <dji.ux.workflow.CameraSensorCleaningWorkFlow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <!-- Widgets in top status bar -->
+    <LinearLayout
+        android:id="@+id/signal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@color/dark_gray"
+        android:orientation="horizontal">
+
+        <dji.ux.widget.PreFlightStatusWidget
+            android:layout_width="238dp"
+            android:layout_height="25dp"/>
+
+        <dji.ux.widget.FlightModeWidget
+            android:layout_width="103dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.GPSSignalWidget
+            android:layout_width="44dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.VisionWidget
+            android:layout_width="22dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.RemoteControlSignalWidget
+            android:layout_width="38dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.VideoSignalWidget
+            android:layout_width="38dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.BatteryWidget
+            android:layout_width="96dp"
+            android:layout_height="22dp"
+            custom:excludeView="singleVoltage"/>
+
+        <dji.ux.widget.ConnectionWidget
+            android:layout_marginTop="3dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"/>
+    </LinearLayout>
+
+    <dji.ux.widget.RemainingFlightTimeWidget
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="18dp"
+        android:layout_width="match_parent"
+        android:background="@color/transparent"
+        android:layout_height="20dp"/>
+
+    <GridLayout
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signal"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="5"
+        android:background="@drawable/corner_component"
+        android:columnCount="4"
+        android:orientation="vertical"
+        android:rowCount="2">
+
+        <!--   2018.10.05 在Activity 初始化时加载图片，便于实时更新。-->
+        <!-- 1号弹状态及控制 左边空隙 5dp -->
+        <CheckBox
+            android:id="@+id/checkbox1"
+            style="@style/pyloncheckbox1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox2"
+            style="@style/pyloncheckbox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox3"
+            style="@style/pyloncheckbox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox4"
+            style="@style/pyloncheckbox4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- 5号弹状态及控制 -->
+        <CheckBox
+            android:id="@+id/checkbox5"
+            style="@style/pyloncheckbox5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox6"
+            style="@style/pyloncheckbox6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox7"
+            style="@style/pyloncheckbox7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/checkbox8"
+            style="@style/pyloncheckbox8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </GridLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/tab_width"
+        android:layout_height="70dp"
+        android:layout_alignEnd="@id/map_widget"
+        android:background="@drawable/corner_component"
+        android:layout_below="@id/signal"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tablayout"
+            android:layout_width="@dimen/tab_width"
+            android:layout_height="30dp"
+            app:tabIndicatorColor="@color/ind_red"
+            app:tabIndicatorHeight="2dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/ind_red"
+            app:tabTextAppearance="@style/TabStyle"
+            app:tabTextColor="@android:color/white" />
+
+        <!--<com.dji.ImportSDKDemo.AutofitViewPager-->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/tab_viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/corner_component"/>
+    </LinearLayout>
+
+    <!--罗盘界面-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <dji.ux.widget.dashboard.DashboardWidget
+            android:id="@+id/Compass"
+            android:layout_width="419dp"
+            android:layout_height="91dp"
+            android:layout_marginRight="12dp"
+            tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+    <!--Take off and return home buttons on left -->
+    <LinearLayout
+        android:id="@+id/TakeOffReturnPanel"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@id/status"
+        android:orientation="vertical">
+
+        <dji.ux.widget.TakeOffWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="5dp"/>
+
+        <dji.ux.widget.ReturnHomeWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
+
+<!--
+
+    <dji.ux.widget.controls.PictureVideoSwitch
+        android:id="@+id/CameraCapturePanel1"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/fire"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="40dp"
+        android:visibility="visible"
+        tools:ignore="RtlHardcoded" />
+
+    <dji.ux.widget.controls.CameraCaptureWidget
+        android:id="@+id/CameraCapturePanel2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/CameraCapturePanel1"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="30dp"
+        android:visibility="visible"
+        tools:ignore="RtlHardcoded" />
+-->
+
+    <!-- Pre-flight checklist panel -->
+    <dji.ux.panel.PreFlightCheckListPanel
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signal"
+        custom:excludeItem="ESCStatus"
+        android:visibility="gone"/>
+
+</RelativeLayout>

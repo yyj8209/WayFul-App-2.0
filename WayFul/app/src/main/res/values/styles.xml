@@ -1,0 +1,66 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:background">@color/background_blue</item>
+        <item name="android:textColor">@color/light_gray</item>
+        <item name="android:textColorPrimary">@color/medium_blue</item>
+        <item name="android:textColorSecondary">@color/light_gray</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!-- 弹出式对话框 theme. -->
+    <style name="CustomDialogStyle" parent="android:Theme.Holo.Dialog.NoActionBar">
+        <item name="android:background">@color/white_medium_transparent</item>
+        <item name="android:textColor">@color/medium_blue</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="pyloncheckbox1" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon1</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox2" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon2</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox3" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon3</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox4" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon4</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox5" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon5</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox6" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon6</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox7" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon7</item>
+        <item name="android:background">@null</item>
+    </style>
+    <style name="pyloncheckbox8" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_pylon8</item>
+        <item name="android:background">@null</item>
+    </style>
+
+    <style name="AppTheme1" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="TabStyle" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">true</item>
+        <item name="android:textSize">15dp</item>
+    </style>
+
+</resources>

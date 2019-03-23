@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/viewpaper_width"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/btn_downactive"
+        android:layout_width="@dimen/button_width4"
+        android:layout_height="@dimen/button_heigth"
+        android:text="激活下行"
+        android:textColor="@color/black"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btn_downcheck"
+        android:layout_width="@dimen/button_width4"
+        android:layout_height="@dimen/button_heigth"
+        android:text="测试下行"
+        android:textColor="@color/black"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btn_browselog"
+        android:layout_width="@dimen/button_width4"
+        android:layout_height="@dimen/button_heigth"
+        android:text="查看记录"
+        android:textColor="@color/black"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btn_exportlog"
+        android:layout_width="@dimen/button_width4"
+        android:layout_height="@dimen/button_heigth"
+        android:text="导出记录"
+        android:textColor="@color/black"
+        android:textSize="@dimen/button_txtsize" />
+</LinearLayout>

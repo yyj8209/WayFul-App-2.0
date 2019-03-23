@@ -1,0 +1,5 @@
+*.log
+*.temp
+*.apk
+\WarFul\app\src\main\AndroidManifest.xml
+AndroidManifest.xml

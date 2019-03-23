@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/viewpaper_width"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/btn_fire"
+        android:layout_width="@dimen/button_width2"
+        android:layout_height="@dimen/button_heigth"
+        android:text="发射"
+        android:textColor="@color/black"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btn_trim"
+        android:layout_width="@dimen/button_width2"
+        android:layout_height="@dimen/button_heigth"
+        android:text="微调"
+        android:textColor="@color/black"
+        android:textSize="@dimen/button_txtsize" />
+</LinearLayout>

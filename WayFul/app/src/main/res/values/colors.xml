@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#00000000</color>
+    <color name="light_gray">#B3FFFFFF</color>
+    <color name="background_blue">#242d34</color>
+    <color name="dark_gray">#80000000</color>
+    <color name="medium_blue">#298080</color>
+    <color name="medium_green">#528957</color>
+    <color name="medium_red">#FF5B47</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="smoking_bomb">#B3BBBB</color>
+    <color name="tear_bomb">#89B0F0</color>
+    <color name="stun_bomb">#FF8070</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="ind_red">#B30E17</color>
+    <color name="blue_light">#00C0E4</color>
+    <color name="material_orange">#ffEF6C00</color>
+</resources>
