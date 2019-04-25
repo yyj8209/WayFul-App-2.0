@@ -20,7 +20,7 @@ public class Fragment1 extends Fragment {
     public static final String TAG_1 = "Fragment1";
     //...
     private SendMessageCommunitor sendMessage;
-    Button btn1,btn2;
+    Button btn1,btn2,btn3;
 
 
     @Nullable
@@ -28,8 +28,9 @@ public class Fragment1 extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate( R.layout.fragment1,container,false);
 
-        btn1 = view.findViewById( R.id.btn_disp_status);
-        btn2 = view.findViewById( R.id.btn_hide_status);
+        btn1 = view.findViewById( R.id.btnDispStatus);
+        btn2 = view.findViewById( R.id.btnHideStatus);
+        btn3 = view.findViewById( R.id.btnSimpleMode);
         btn1.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,6 +42,13 @@ public class Fragment1 extends Fragment {
             @Override
             public void onClick(View v) {
                 sendMessage.sendMessage( btn2.getId() );
+//                Toast.makeText( getActivity(),"点击第一个按钮",Toast.LENGTH_SHORT ).show();
+            }
+        } );
+        btn3.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage.sendMessage( btn3.getId() );
 //                Toast.makeText( getActivity(),"点击第一个按钮",Toast.LENGTH_SHORT ).show();
             }
         } );

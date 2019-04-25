@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/viewpaper_width"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:paddingTop="3dp"
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/btn_fire"
-        android:layout_width="@dimen/button_width2"
+        android:id="@+id/btnTrim"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/button_heigth"
-        android:text="发射"
-        android:textColor="@color/black"
+        android:text="弹仓开关微调"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_trim"
-        android:layout_width="@dimen/button_width2"
+        android:id="@+id/btnFireAllMode"
+        android:layout_width="60dp"
         android:layout_height="@dimen/button_heigth"
-        android:text="微调"
-        android:textColor="@color/black"
+        android:layout_marginLeft="20dp"
+        android:text="发射"
+        android:background="@drawable/corner_red_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
+
 </LinearLayout>

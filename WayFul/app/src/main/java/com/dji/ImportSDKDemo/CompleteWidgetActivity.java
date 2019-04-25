@@ -1,5 +1,6 @@
 package com.dji.ImportSDKDemo;
 
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,10 +16,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +30,7 @@ import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RadioGroup;
@@ -82,7 +86,7 @@ import dji.ux.widget.MapWidget;
 
 
 /** Activity that shows all the UI elements together */
-public class CompleteWidgetActivity extends FragmentActivity implements CompoundButton.OnCheckedChangeListener
+public class CompleteWidgetActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener
                                                                             ,Fragment1.SendMessageCommunitor
                                                                             ,Fragment2.SendMessageCommunitor
                                                                             ,Fragment3.SendMessageCommunitor
@@ -129,16 +133,23 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
 
     // 导航栏部分
+    private LinearLayout ll_allview = null;
+//    private DrawerLayout ll_allview = null;
     private TabLayout tabLayout = null;
     private ViewPager vp_pager;
 //    private AutofitViewPager vp_pager;
     private List<Fragment> fragments;
     private String[] titles;
 
+    // 简洁操作界面部分
+    private Button btnFire, btnMoreMode;
+    private LinearLayout ll_simpleview = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_default_widgets );
+        ActivityCollector.addActivity( this );
 
         height = DensityUtil.dip2px( this, 100 );
         width = DensityUtil.dip2px( this, 150 );
@@ -149,6 +160,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
         deviceWidth = displayMetrics.widthPixels;
 
         mapWidget = (MapWidget) findViewById( R.id.map_widget );
+//        djiMap = (DJIMap) mapWidget.getMap();
 
         mapWidget.initAMap( new MapWidget.OnMapReadyListener() {
             @Override
@@ -190,7 +202,6 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
         } );
 
         mapWidget.onCreate( savedInstanceState );
-//        djiMap = (DJIMap) mapWidget.getMap();
 
         parentView = (ViewGroup) findViewById( R.id.root_view );
         vStatus = (ViewGroup) findViewById( R.id.status );
@@ -203,14 +214,32 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
             }
         } );
 
-        InitMainUI();   // 为初始化刷新挂架状态的函数。
+        btnFire = (Button)findViewById( R.id.ico_fire );
+        btnFire.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClick( btnFire );
+            }
+        } );
+        btnMoreMode = (Button)findViewById( R.id.ico_more );
+        btnMoreMode.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClick( btnMoreMode );
+            }
+        } );
+//        ll_allview = (DrawerLayout)findViewById( R.id.all_view ) ;
+        ll_allview = (LinearLayout)findViewById( R.id.all_view ) ;
+        ll_simpleview = (LinearLayout)findViewById( R.id.simple_view );
+
+        initMainUI();   // 为初始化刷新挂架状态的函数。
         initTabLayoutView();   // 导航栏初始化。
-        UpdateImage(dataDown);    // 初始化和更新挂架状态的显示。2018.10.04
+        updateImage(dataDown);    // 初始化和更新挂架状态的显示。2018.10.04
 //        onDataFromOnboardToMSDK();   // 设置接收下行数据的函数。
         addListener();    // 对添加航线飞行目标点的监视。    2019.2.9
     }
 
-    private void InitMainUI(){
+    private void initMainUI(){
         // 将挂架存储为数组形式，方便在循环中调用。  2018.10.17
         cb[0] = (CheckBox) findViewById( R.id.checkbox1 );
         cb[1] = (CheckBox)findViewById( R.id.checkbox2 );
@@ -263,7 +292,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     }
 
     // 初始化和更新挂架状态的显示。2018.10.04
-    public void UpdateImage(byte[] data) {
+    public void updateImage(byte[] data) {
         int bomb_type = 0;
         for (int i = 0; i < data.length/2; i ++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，
         {
@@ -294,16 +323,16 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
         fragments.add(new Fragment2());
         fragments.add(new Fragment3());
         fragments.add(new Fragment4());
-        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" );
+        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" ).setIcon( getDrawable( R.drawable.alert_icon ) );
         TabLayout.Tab tab2 = tabLayout.newTab().setText( "发射操作" );
         TabLayout.Tab tab3 = tabLayout.newTab().setText( "航线飞行" );
-        TabLayout.Tab tab4 = tabLayout.newTab().setText( "设置" );
+        TabLayout.Tab tab4 = tabLayout.newTab().setText( "更多功能" );
         tabLayout.addTab( tab1 );
         tabLayout.addTab( tab2 );
         tabLayout.addTab( tab3 );
         tabLayout.addTab( tab4 );
 
-        titles = new String[]{"弹仓状态","发射操作","航线飞行","设置"};
+        titles = new String[]{"弹仓状态","发射操作","航线飞行","更多功能"};
         MyAdapter adapter = new MyAdapter(getSupportFragmentManager(),fragments,titles);
         vp_pager.setAdapter(adapter);
         tabLayout.setupWithViewPager(vp_pager);   //关联TabLayout和ViewPager
@@ -312,6 +341,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
         linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
         linearLayout.setDividerDrawable( ContextCompat.getDrawable(this,
                 R.drawable.divide_vitercle));
+//        ll_allview.openDrawer( Gravity.RIGHT);//侧滑打开  不设置则不会默认打开
     }
 //
     public class MyAdapter extends FragmentPagerAdapter {
@@ -345,32 +375,38 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     public void sendMessage(int btnId) {
         //...写上你想执行的代码
         switch (btnId) {
-            case R.id.btn_disp_status:
+            case R.id.btnDispStatus:
                 vStatus.setVisibility( View.VISIBLE );
 //                Toast.makeText( getApplicationContext(), "显示弹仓状态", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_hide_status:
-                vStatus.setVisibility( View.INVISIBLE );
+            case R.id.btnHideStatus:
+                vStatus.setVisibility( View.GONE );
 //                Toast.makeText( getApplicationContext(), "隐藏弹仓状态", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_fire:
+            case R.id.btnSimpleMode:
+                Toast.makeText( getApplicationContext(), "敬请关注……", Toast.LENGTH_SHORT ).show();
+//                ll_allview.setVisibility( View.GONE );
+////                ll_allview.closeDrawer(Gravity.RIGHT);;
+//                ll_simpleview.setVisibility( View.VISIBLE );
+                break;
+            case R.id.btnFireAllMode:
                 onFireClick();
 //                Toast.makeText( getApplicationContext(), "发射", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_trim:
+            case R.id.btnTrim:
                 onFireClick();
 //                Toast.makeText( getApplicationContext(), "微调", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_addmarks:
+            case R.id.btnAddMarks:
                 isAdd = true;
 //                Toast.makeText( getApplicationContext(), "添加航点", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_upload:
+            case R.id.btnUpload:
                 isAdd = false;
                 uploadWayPointMission();
 //                Toast.makeText( getApplicationContext(), "上传航点", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_clearmarks:
+            case R.id.btnClearMarks:
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -382,19 +418,19 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
                 updateDroneLocation();
                 Toast.makeText(CompleteWidgetActivity.this,"清除目标点成功",Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.btn_start:
+            case R.id.btnStart:
                 startWaypointMission();
 //                Toast.makeText( getApplicationContext(), "开始航线飞行", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_stop:
+            case R.id.btnStop:
                 stopWaypointMission();
 //                Toast.makeText( getApplicationContext(), "停止航线飞行", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_settings:
+            case R.id.btnSettings:
                 showSettingDialog();
 //                Toast.makeText( getApplicationContext(), "航线飞行设置", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_downactive:
+            case R.id.btnDownActive:
                 onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
                 SystemClock.sleep(1000);  // 等待下行数据。
                 for(int i=0;i<dataUp.length/2;i++)
@@ -403,14 +439,14 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
                 showProgressDialog();
 //                Toast.makeText( getApplicationContext(), "激活下行链路", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_downcheck:
-                OnPylonsStatusClick();
+            case R.id.btnDownCheck:
+                onPylonsStatusClick();
 //                Toast.makeText( getApplicationContext(), "检查下行链路", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_browselog:
+            case R.id.btnBrowseLog:
                 Toast.makeText( getApplicationContext(), "查看日志", Toast.LENGTH_SHORT ).show();
                 break;
-            case R.id.btn_exportlog:
+            case R.id.btnExportLog:
                 Toast.makeText( getApplicationContext(), "导出日志", Toast.LENGTH_SHORT ).show();
                 break;
             default:
@@ -528,7 +564,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
                     // 1、更新挂架状态；2、提示正在执行的操作。
     //                UpdateHints(dataDown,data);
                     System.arraycopy(data, 0, dataDown, 0, PYLON_NUM*2);  // 下行状态数据拷贝到dataDown。
-                    UpdateImage(dataDown);  // 作为测试，这两行可以暂时不要。2018.11.14
+                    updateImage(dataDown);  // 作为测试，这两行可以暂时不要。2018.11.14
                 }
             });
     }
@@ -544,9 +580,13 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
             ResizeAnimation mapViewAnimation = new ResizeAnimation( mapWidget, width, height, deviceWidth, deviceHeight, 0 );
             mapWidget.startAnimation( mapViewAnimation );
             isMapMini = false;
+        } else if (view == btnFire) {    // 发射操作
+            onFireClick();
+        }else if (view == btnMoreMode) {    // 打开完全功能界面
+            Toast.makeText( getApplicationContext(), "切换到完全功能模式", Toast.LENGTH_SHORT ).show();
+
         }
     }
-
 
     private void resizeFPVWidget(int width, int height, int margin, int fpvInsertPosition) {
         RelativeLayout.LayoutParams fpvParams = (RelativeLayout.LayoutParams) fpvWidget.getLayoutParams();
@@ -560,47 +600,9 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
         parentView.addView( fpvWidget, fpvInsertPosition );
     }
 
-    // 参数设置 2018.08.17
-//    private void OnSettingsClick(View view){
-//        Context wrapper = new ContextThemeWrapper(this,R.style.CustomDialogStyle);
-//        PopupMenu popupMenu = new PopupMenu(wrapper,view);
-//        popupMenu.getMenuInflater().inflate(R.menu.settings, popupMenu.getMenu());
-//        popupMenu.show();
-//        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//                switch (item.getItemId()){
-//                    case R.id.down_active:
-//                        onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
-//                        SystemClock.sleep(1000);  // 等待下行数据。
-//                        for(int i=0;i<dataUp.length/2;i++)
-//                            dataUp[2*i+1] = 0X05;
-//                        onDataFromMSDKToOSDK( dataUp );
-//                        showProgressDialog();
-//                        break;
-//                    case R.id.down_check:
-//                        OnPylonsStatusClick();
-////                        Toast.makeText(CompleteWidgetActivity.this,"下行链路正常",Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case R.id.marks_show:
-////                        TableListActivity.actionStart(CompleteWidgetActivity.this);
-//                        Toast.makeText(CompleteWidgetActivity.this,"你选择了显示记录",Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case R.id.marks_export:
-//                        Toast.makeText(CompleteWidgetActivity.this,"你选择了导出记录",Toast.LENGTH_SHORT).show();
-//                        break;
-//                    case R.id.exit:
-//                        onDestroy();
-//                        break;
-//                }
-//                return false;
-//            }
-//        });
-//    }
-
     // 检查载荷状态 2018.08.17
     // 已经删除了该按钮，但仍然作为函数保留下来。
-    private void OnPylonsStatusClick(){
+    private void onPylonsStatusClick(){
         CheckPylonsDialog dialog = new CheckPylonsDialog(CompleteWidgetActivity.this,
                 R.style.CustomDialogStyle,dataDown);
         dialog.show();
@@ -653,7 +655,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
             public void onClick (DialogInterface dialog,int which)
             {
                 // 1-无操作，2-发射准备，3-发射，4-取消发射，5-返回挂架状态，6-调整盖板
-                SetdataUp(cbChecked,3);    // public void SetdataUp(boolean [] cbChecked,int flag)
+                setDataUp(cbChecked,3);    // public void setDataUp(boolean [] cbChecked,int flag)
                 onDataFromMSDKToOSDK(dataUp);
 //                FireButton.setBackgroundColor( getColor( R.color.red ) );
 //                FireButton.setEnabled( true );    // 激活<发射>按钮。
@@ -663,7 +665,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
             @Override
             public void onClick (DialogInterface dialog, int which)
             {
-                SetdataUp(cbChecked,6);    // public void SetdataUp(boolean [] cbChecked,int flag)
+                setDataUp(cbChecked,6);    // public void setDataUp(boolean [] cbChecked,int flag)
                 onDataFromMSDKToOSDK(dataUp);
             }
         });
@@ -744,7 +746,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
             @Override
             public void onClick (DialogInterface dialog,int which)
             {
-                SetdataUp(cbChecked,3);    // public void SetdataUp(boolean [] cbChecked,int flag)
+                setDataUp(cbChecked,3);    // public void setDataUp(boolean [] cbChecked,int flag)
                 onDataFromMSDKToOSDK(dataUp);
                 FireButton.setBackgroundColor( getColor( R.color.gray_light ) );
                 FireButton.setEnabled( false );    // 关闭<发射>按钮。
@@ -787,7 +789,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     }
     // 根据选中的挂架和操作要求，设置上行指令。
     // 1-无操作，2-发射准备，3-发射，4-取消发射，5-返回挂架状态，6-调整盖板
-    private void SetdataUp(boolean [] cbChecked,int flag)
+    private void setDataUp(boolean [] cbChecked,int flag)
     {
         for(int i=0;i<cbChecked.length;i++)
         {
@@ -848,94 +850,40 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     //用于OnboardSDK与MobileSDK通信时，激活下行通道。
     private void showProgressDialog() {
         /* @setProgress 设置初始进度
-         * @setProgressStyle 设置样式（水平进度条）
-         * @setMax 设置进度最大值
+         * @setProgressStyle 设置样式（圆形进度条）
          */
-        final int MAX_PROGRESS = 100;
         final ProgressDialog progressDialog =
                 new ProgressDialog(CompleteWidgetActivity.this);
-        progressDialog.setProgress(0);
-        progressDialog.setTitle("正在激活，请稍等……");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setMax(MAX_PROGRESS);
+        progressDialog.setProgressStyle( ProgressDialog.STYLE_SPINNER );
+        progressDialog.setCancelable( false );
+        progressDialog.setIcon( R.drawable.rtk_icon );
+        progressDialog.setTitle("正在激活下行链路。");
+        progressDialog.setMessage( "正在激活，请勿操作……" );
         progressDialog.show();
-        /* 模拟进度增加的过程
-         * 新开一个线程，每个100ms，进度增加2
-         */
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int progress= 0;
-                while (progress < MAX_PROGRESS){
-                    try {
-                        Thread.sleep(100);
-                        progress += 2;
-                        progressDialog.setProgress(progress);
-                    } catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
+                try {
+                    Thread.sleep(5000);
+                    progressDialog.cancel();
+                } catch (InterruptedException e){
+                    e.printStackTrace();
                 }
-                // 进度达到最大值后，窗口消失
-                progressDialog.cancel();
             }
         }).start();
     }
 
     /* 航线飞行部分*/
     // 航线飞行设置2019.1.26
-    private void onRouteFlightClick(View view){
+    private void onRouteFlightClick(){
         // 这三行在调试时不要。  2019.2.9
-//        FlightController mFlightController = GetProductApplication.getFlightControllerInstance();
-//        getDroneLocation(mFlightController);    // 初始化航线飞行。
+        FlightController mFlightController = GetProductApplication.getFlightControllerInstance();
+        getDroneLocation(mFlightController);    // 初始化航线飞行。
 //        cameraUpdate();
 
-//        djiMap = (DJIMap) mapWidget.getMap();
+        djiMap = (DJIMap) mapWidget.getMap();
 
-        Context wrapper = new ContextThemeWrapper(this,R.style.Theme_AppCompat_DayNight_NoActionBar);
-        PopupMenu popupMenu = new PopupMenu(wrapper,view);
-        popupMenu.getMenuInflater().inflate(R.menu.route_flight, popupMenu.getMenu());
-        popupMenu.show();
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.add_marks:
-                        isAdd = true;
-//                        Toast.makeText(getApplicationContext(),"请在地图上添加目标点后，点击上传。",Toast.LENGTH_LONG).show();
-                        break;
-                    case R.id.upload:
-                        isAdd = false;
-                        uploadWayPointMission();
-//                        Toast.makeText(CompleteWidgetActivity.this,"上传目标点成功。",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.clear_marks:
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                djiMap.clear();
-                            }
-                        });
-                        waypointList.clear();
-                        waypointMissionBuilder.waypointList(waypointList);
-                        updateDroneLocation();
-                        Toast.makeText(CompleteWidgetActivity.this,"清除目标点成功",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.start:
-                        startWaypointMission();
-//                        Toast.makeText(CompleteWidgetActivity.this,"开始按航线飞行",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.stop:
-                        stopWaypointMission();
-//                        Toast.makeText(CompleteWidgetActivity.this,"停止按航线飞行",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.settings:
-                        showSettingDialog();
-//                        Toast.makeText(CompleteWidgetActivity.this,"航线参数设置",Toast.LENGTH_SHORT).show();
-                        break;
-                }
-                return false;
-            }
-        });
     }
 //     获取飞机位置
     private void getDroneLocation(FlightController mFlightController){
@@ -1211,7 +1159,6 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     }
     /* 航线飞行部分 END */
 
-
 //    // On click event for button
 //    public void OnResizeRange(View v){
 //
@@ -1254,6 +1201,33 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
     }
 
     @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(CompleteWidgetActivity.this);
+        builder.setIcon(R.drawable.ic_drone);
+        builder.setTitle("提示");
+        builder.setMessage("确定退出吗？");
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {// 参考《第一行代码》中的随时退出程序部分。2019.04.14
+                ActivityCollector.finishAll();
+            }
+        });
+        //    设置一个NegativeButton
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+            }
+        });
+        //    显示出该对话框
+        builder.show();
+//        super.onBackPressed();
+    }
+
+    @Override
     protected void onDestroy() {
         mapWidget.onDestroy();
         // Prevent memory leak by releasing DJISDKManager's references to this activity
@@ -1261,6 +1235,7 @@ public class CompleteWidgetActivity extends FragmentActivity implements Compound
             DJISDKManager.getInstance().destroy();
         }
         removeListener();
+        ActivityCollector.removeActivity( this );
         super.onDestroy();
     }
 

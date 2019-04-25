@@ -1,38 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/viewpaper_width"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:paddingTop="3dp"
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/btn_downactive"
+        android:id="@+id/btnDownActive"
         android:layout_width="@dimen/button_width4"
         android:layout_height="@dimen/button_heigth"
         android:text="激活下行"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_downcheck"
+        android:id="@+id/btnDownCheck"
         android:layout_width="@dimen/button_width4"
         android:layout_height="@dimen/button_heigth"
         android:text="测试下行"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_browselog"
+        android:id="@+id/btnBrowseLog"
         android:layout_width="@dimen/button_width4"
         android:layout_height="@dimen/button_heigth"
         android:text="查看记录"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_exportlog"
+        android:id="@+id/btnExportLog"
         android:layout_width="@dimen/button_width4"
         android:layout_height="@dimen/button_heigth"
         android:text="导出记录"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 </LinearLayout>

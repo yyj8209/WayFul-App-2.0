@@ -28,10 +28,10 @@ public class Fragment4 extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate( R.layout.fragment4,container,false);
 
-        btn1 = view.findViewById( R.id.btn_downactive);
-        btn2 = view.findViewById( R.id.btn_downcheck);
-        btn3 = view.findViewById( R.id.btn_browselog);
-        btn4 = view.findViewById( R.id.btn_exportlog);
+        btn1 = view.findViewById( R.id.btnDownActive);
+        btn2 = view.findViewById( R.id.btnDownCheck);
+        btn3 = view.findViewById( R.id.btnBrowseLog);
+        btn4 = view.findViewById( R.id.btnExportLog);
         btn1.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {

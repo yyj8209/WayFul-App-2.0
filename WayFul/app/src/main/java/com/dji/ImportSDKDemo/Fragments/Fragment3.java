@@ -24,12 +24,12 @@ public class Fragment3 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate( R.layout.fragment3,container,false);
-        btn1 = view.findViewById( R.id.btn_addmarks);
-        btn2 = view.findViewById( R.id.btn_upload);
-        btn3 = view.findViewById( R.id.btn_clearmarks);
-        btn4 = view.findViewById( R.id.btn_start);
-        btn5 = view.findViewById( R.id.btn_stop);
-        btn6 = view.findViewById( R.id.btn_settings);
+        btn1 = view.findViewById( R.id.btnAddMarks);
+        btn2 = view.findViewById( R.id.btnUpload);
+        btn3 = view.findViewById( R.id.btnClearMarks);
+        btn4 = view.findViewById( R.id.btnStart);
+        btn5 = view.findViewById( R.id.btnStop);
+        btn6 = view.findViewById( R.id.btnSettings);
         btn1.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {

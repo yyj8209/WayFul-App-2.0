@@ -6,11 +6,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -20,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -44,8 +47,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Main activity that displays three choices to user */
 public class MainActivity extends Activity implements View.OnClickListener{
-//    private static final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity";
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
+    Button btnUI = null;
     private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
         // 又遇到不注册的问题，断点设在这里没有反应，我检查了网络，重启了手机，改回compileSdkVersion，没有效果。重新同步dji-uxsdk包，没有效果。Debug，
@@ -58,9 +62,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
             isRegistrationInProgress.set(false);
             if (error == DJISDKError.REGISTRATION_SUCCESS) {
                 DJISDKManager.getInstance().startConnectionToProduct();
-                Toast.makeText(getApplicationContext(), "正在注册...", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "正在注册...", Toast.LENGTH_SHORT).show();
                 loginAccount();
-                findViewById(R.id.complete_ui_widgets).setBackgroundColor( getColor( R.color.medium_green ) );
+                btnUI.setText("进入程序");
+                btnUI.setBackgroundColor( Color.parseColor("#60CC60"));
+//                btnUI.setBackground(getDrawable( R.drawable.corner_green_btn) );
 
             } else {
                 Toast.makeText(getApplicationContext(),
@@ -95,7 +101,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.complete_ui_widgets).setOnClickListener(this);
+        ActivityCollector.addActivity( this );
+        btnUI = (Button) findViewById(R.id.complete_ui_widgets);
+        btnUI.setOnClickListener(this);
 
         checkAndRequestPermissions();
     }
@@ -107,6 +115,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             DJISDKManager.getInstance().destroy();
         }
         super.onDestroy();
+        ActivityCollector.removeActivity( this );
     }
 
     private void loginAccount(){
@@ -114,7 +123,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 new CommonCallbacks.CompletionCallbackWith<UserAccountState>() {
                     @Override
                     public void onSuccess(final UserAccountState userAccountState) {
-                        Toast.makeText(getApplicationContext(), "注册成功！", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), "注册成功！", Toast.LENGTH_LONG).show();
                     }
                     @Override
                     public void onFailure(DJIError error) {
@@ -195,6 +204,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             Class nextActivityClass;
             nextActivityClass = CompleteWidgetActivity.class;
             Intent intent = new Intent(this, nextActivityClass);
+//            intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
         }
         else{

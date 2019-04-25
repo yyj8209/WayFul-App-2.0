@@ -60,7 +60,7 @@
     </style>
     <style name="TabStyle" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">true</item>
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
 </resources>

@@ -2,23 +2,37 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/viewpaper_width"
-    android:layout_height="@dimen/button_heigth"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="3dp"
     tools:context=".CompleteWidgetActivity"
     android:orientation="horizontal">
 
     <Button
-        android:id = "@+id/btn_disp_status"
+        android:id = "@+id/btnDispStatus"
         android:layout_width="@dimen/button_width4"
         android:layout_height="@dimen/button_heigth"
         android:textSize="@dimen/button_txtsize"
-        android:text="显示状态"/>
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:text="显示弹仓"/>
 
     <Button
-        android:id = "@+id/btn_hide_status"
+        android:id = "@+id/btnHideStatus"
         android:layout_width="@dimen/button_width4"
         android:layout_height="@dimen/button_heigth"
         android:textSize="@dimen/button_txtsize"
-        android:text="隐藏状态"/>
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:text="隐藏弹仓"/>
+
+    <Button
+        android:id = "@+id/btnSimpleMode"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_heigth"
+        android:textSize="@dimen/button_txtsize"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:text="简洁操作模式"/>
 
 </LinearLayout >

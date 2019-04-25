@@ -3,23 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/splash1"
-    android:paddingEnd="70dp"
-    android:paddingStart="70dp">
+    android:background="@mipmap/splash1">
 
 
         <Button
             android:id="@+id/complete_ui_widgets"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/gray_light"
             android:layout_gravity="bottom"
-            android:layout_margin="5dp"
-            android:background="@android:color/darker_gray"
-            android:baselineAligned="false"
-            android:padding="10dp"
-            android:text="进入程序"
-            android:textColor="@color/light_gray"
-            android:textSize="16dp"
+            android:layout_marginBottom="5dp"
+            android:text="正在注册…"
+            android:textColor="@color/white"
+            android:textSize="@dimen/string_size"
             android:textStyle="bold" />
 
 </LinearLayout>

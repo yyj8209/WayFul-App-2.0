@@ -1,54 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/viewpaper_width"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:paddingTop="3dp"
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/btn_addmarks"
+        android:id="@+id/btnAddMarks"
         android:layout_width="@dimen/button_width2"
         android:layout_height="@dimen/button_heigth"
         android:text="添加"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_upload"
+        android:id="@+id/btnUpload"
         android:layout_width="@dimen/button_width2"
         android:layout_height="@dimen/button_heigth"
         android:text="上传"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_clearmarks"
+        android:id="@+id/btnClearMarks"
         android:layout_width="@dimen/button_width2"
         android:layout_height="@dimen/button_heigth"
         android:text="清除"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_start"
+        android:id="@+id/btnStart"
         android:layout_width="@dimen/button_width2"
         android:layout_height="@dimen/button_heigth"
         android:text="飞行"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_stop"
+        android:id="@+id/btnStop"
         android:layout_width="@dimen/button_width2"
         android:layout_height="@dimen/button_heigth"
         android:text="停止"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 
     <Button
-        android:id="@+id/btn_settings"
+        android:id="@+id/btnSettings"
         android:layout_width="@dimen/button_width2"
         android:layout_height="@dimen/button_heigth"
         android:text="设置"
-        android:textColor="@color/black"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
         android:textSize="@dimen/button_txtsize" />
 </LinearLayout>
