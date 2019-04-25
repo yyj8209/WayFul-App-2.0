@@ -20,9 +20,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
-import android.view.Gravity;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -30,29 +27,26 @@ import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 
 import android.widget.TextView;
 import android.widget.Toast;
-/*
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.AMap.OnMapClickListener;
-import com.amap.api.maps.CameraUpdate;
-import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.MapView;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
-*/
+
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.CameraUpdateFactory;
+import com.amap.api.maps2d.MapView;
+import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.Marker;
+import com.amap.api.maps2d.model.MarkerOptions;
+
 import com.dji.ImportSDKDemo.Fragments.Fragment1;
 import com.dji.ImportSDKDemo.Fragments.Fragment2;
 import com.dji.ImportSDKDemo.Fragments.Fragment3;
 import com.dji.ImportSDKDemo.Fragments.Fragment4;
+
 import com.dji.mapkit.maps.DJIMap;
 import com.dji.mapkit.maps.camera.DJICameraUpdate;
 import com.dji.mapkit.maps.camera.DJICameraUpdateFactory;
@@ -84,6 +78,8 @@ import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.ux.widget.MapWidget;
 
+import static com.dji.ImportSDKDemo.GetProductApplication.getWaypointMissionOperator;
+
 
 /** Activity that shows all the UI elements together */
 public class CompleteWidgetActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener
@@ -96,8 +92,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     protected static final String TAG_COM = "CompleteWidgetActivity";
     public static final int PYLON_NUM = 8;
 
-    private MapWidget mapWidget;
-//    private AMap aMap;
+//    private MapWidget mapWidget;
     private ViewGroup parentView,vStatus;
     private View fpvWidget;
     private boolean isMapMini = true;
@@ -119,11 +114,13 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     private int deviceHeight;
 
 //    // 航线飞行部分变量
+    private MapView mapView;
+    private AMap aMap;
+//    private DJIMap aMap;
     private double droneLocationLat = 181, droneLocationLng = 181;   // 飞机位置。
-    private DJIMarker droneMarker = null;
-    private DJIMap djiMap;
+    private Marker droneMarker = null;
     private boolean isAdd = false;
-    private final Map<Integer, DJIMarker> mMarkers = new ConcurrentHashMap<Integer, DJIMarker>();
+    private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
     private float altitude = 100.0f;
     private float mSpeed = 10.0f;
     private List<Waypoint> waypointList = new ArrayList<>();
@@ -159,53 +156,10 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         deviceHeight = displayMetrics.heightPixels;
         deviceWidth = displayMetrics.widthPixels;
 
-        mapWidget = (MapWidget) findViewById( R.id.map_widget );
-//        djiMap = (DJIMap) mapWidget.getMap();
-
-        mapWidget.initAMap( new MapWidget.OnMapReadyListener() {
-            @Override
-            public void onMapReady(@NonNull DJIMap map) {
-//                map = djiMap;   // 初始化。
-//                DJILatLng hefei = new DJILatLng(31.83, 117.25);
-//                map.addMarker(new DJIMarkerOptions().position(hefei).title("定位于合肥"));
-//                map.moveCamera( DJICameraUpdateFactory.newCameraPosition( (DJICameraPosition) shenzhen ));
-                djiMap = (DJIMap) mapWidget.getMap();
-
-                map.setOnMapClickListener( new DJIMap.OnMapClickListener() {
-                    @Override
-                    public void onMapClick(DJILatLng latLng) {
-                        onViewClick( mapWidget );// 添加航迹规划的函数。2019.1.19
-                        if (isAdd == true) {
-                            markWaypoint( latLng );   // 可以添加目标点。   2019.02.08
-                            Waypoint mWaypoint = new Waypoint( latLng.latitude, latLng.longitude, altitude );
-                            Toast.makeText(CompleteWidgetActivity.this,
-                                    "经度：" +String.valueOf(latLng.latitude)+
-                                            "，纬度：" +String.valueOf(latLng.longitude)+
-                                            "，高度：" +String.valueOf(altitude), Toast.LENGTH_SHORT).show();
-                            //Add Waypoints to Waypoint arraylist;
-                            if (waypointMissionBuilder != null) {
-                                waypointList.add( mWaypoint );
-                                waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
-                            } else {
-                                waypointMissionBuilder = new WaypointMission.Builder();
-                                waypointList.add( mWaypoint );
-                                waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
-                            }
-                        }
-                        else{
-                            Toast.makeText(CompleteWidgetActivity.this,"请点击添加后添加目标点。",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } );
-            }
-        } );
-
-        mapWidget.onCreate( savedInstanceState );
-
         parentView = (ViewGroup) findViewById( R.id.root_view );
         vStatus = (ViewGroup) findViewById( R.id.status );
 
+        mapView = (MapView) findViewById( R.id.map_widget );
         fpvWidget = findViewById( R.id.fpv_widget );
         fpvWidget.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -234,9 +188,49 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 
         initMainUI();   // 为初始化刷新挂架状态的函数。
         initTabLayoutView();   // 导航栏初始化。
+        initMap();
+        mapView.onCreate( savedInstanceState );
         updateImage(dataDown);    // 初始化和更新挂架状态的显示。2018.10.04
 //        onDataFromOnboardToMSDK();   // 设置接收下行数据的函数。
         addListener();    // 对添加航线飞行目标点的监视。    2019.2.9
+    }
+
+    private void initMap(){
+
+        if (aMap == null) {
+            aMap = mapView.getMap();
+            aMap.setOnMapClickListener( new AMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    onViewClick( mapView );// 添加航迹规划的函数。2019.1.19
+                    if (isAdd == true) {
+                        markWaypoint( latLng );   // 可以添加目标点。   2019.02.08
+                        Waypoint mWaypoint = new Waypoint( latLng.latitude, latLng.longitude, altitude );
+                        Toast.makeText(CompleteWidgetActivity.this,
+                                "经度：" +String.valueOf(latLng.latitude)+
+                                        "，纬度：" +String.valueOf(latLng.longitude)+
+                                        "，高度：" +String.valueOf(altitude), Toast.LENGTH_SHORT).show();
+                        //Add Waypoints to Waypoint arraylist;
+                        if (waypointMissionBuilder != null) {
+                            waypointList.add( mWaypoint );
+                            waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
+                        } else {
+                            waypointMissionBuilder = new WaypointMission.Builder();
+                            waypointList.add( mWaypoint );
+                            waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
+                        }
+                    }
+                    else{
+                        Toast.makeText(CompleteWidgetActivity.this,"请点击添加后添加目标点。",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } );// add the listener for click for amap object
+        }
+
+        LatLng hefei = new LatLng(31.83, 117.25);
+        aMap.addMarker(new MarkerOptions().position(hefei).title("Marker in HeFei"));
+//        aMap.moveCamera( CameraUpdateFactory.newLatLng(hefei));
     }
 
     private void initMainUI(){
@@ -410,7 +404,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        djiMap.clear();
+                        aMap.clear();
                     }
                 });
                 waypointList.clear();
@@ -568,17 +562,18 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 }
             });
     }
+    
     private void onViewClick(View view) {
 //        Class nextActivityClass = null;
         if (view == fpvWidget && !isMapMini) {// 视频窗小的时候，将其放大。（隐藏航迹规划按钮）
             resizeFPVWidget( RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT, 0, 0 );
-            ResizeAnimation mapViewAnimation = new ResizeAnimation( mapWidget, deviceWidth, deviceHeight, width, height, margin );
-            mapWidget.startAnimation( mapViewAnimation );
+            ResizeAnimation mapViewAnimation = new ResizeAnimation( mapView, deviceWidth, deviceHeight, width, height, margin );
+            mapView.startAnimation( mapViewAnimation );
             isMapMini = true;
-        } else if (view == mapWidget && isMapMini) {// 地图窗小的时候，将其放大。（显示航迹规划按钮）
+        } else if (view == mapView && isMapMini) {// 地图窗小的时候，将其放大。（显示航迹规划按钮）
             resizeFPVWidget( width, height, margin, 2 );
-            ResizeAnimation mapViewAnimation = new ResizeAnimation( mapWidget, width, height, deviceWidth, deviceHeight, 0 );
-            mapWidget.startAnimation( mapViewAnimation );
+            ResizeAnimation mapViewAnimation = new ResizeAnimation( mapView, width, height, deviceWidth, deviceHeight, 0 );
+            mapView.startAnimation( mapViewAnimation );
             isMapMini = false;
         } else if (view == btnFire) {    // 发射操作
             onFireClick();
@@ -882,8 +877,6 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         getDroneLocation(mFlightController);    // 初始化航线飞行。
 //        cameraUpdate();
 
-        djiMap = (DJIMap) mapWidget.getMap();
-
     }
 //     获取飞机位置
     private void getDroneLocation(FlightController mFlightController){
@@ -903,11 +896,11 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 
 
     private void updateDroneLocation(){
-        final DJILatLng pos = new DJILatLng(droneLocationLat, droneLocationLng);
+        final LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
         //Create MarkerOptions object
-        final DJIMarkerOptions markerOptions = new DJIMarkerOptions();
+        final MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(pos);
-        markerOptions.icon( DJIBitmapDescriptorFactory.fromResource(R.drawable.ic_drone));
+        markerOptions.icon( BitmapDescriptorFactory.fromResource(R.drawable.ic_drone));
 
         runOnUiThread(new Runnable() {
             @Override
@@ -916,9 +909,9 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                     droneMarker.remove();
                 }
                 if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
-//                    djiMap.addMarker(markerOptions);   // 尝试如此实现，但droneMarker 未用上。
+//                    aMap.addMarker(markerOptions);   // 尝试如此实现，但droneMarker 未用上。
 //                     droneMarker.setPosition( pos );   // 这个函数不知道是否可行？  2019.2.8
-                   droneMarker = djiMap.addMarker(markerOptions);   // 教程上是这么写的
+                   droneMarker = aMap.addMarker(markerOptions);   // 教程上是这么写的
                 }
             }
         });
@@ -927,19 +920,19 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) && (latitude != 0f && longitude != 0f);
     }
 //    private void cameraUpdate(){
-//        DJILatLng pos = new DJILatLng(droneLocationLat, droneLocationLng);
+//        LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
 //        float zoomlevel = (float) 18.0;
-//        DJICameraPosition djiPos = new DJICameraPosition(pos,zoomlevel);
-//        DJICameraUpdate cu = DJICameraUpdateFactory.newCameraPosition(djiPos);  //newLatLngZoom(pos, zoomlevel);
-//        djiMap.moveCamera(cu);
+//        CameraPosition djiPos = new CameraPosition(pos,zoomlevel);
+//        CameraUpdate cu = DJICameraUpdateFactory.newCameraPosition(djiPos);  //newLatLngZoom(pos, zoomlevel);
+//        aMap.moveCamera(cu);
 //    }
 
-    private void markWaypoint(DJILatLng point){
+    private void markWaypoint(LatLng point){
         //Create MarkerOptions object
-        DJIMarkerOptions markerOptions = new DJIMarkerOptions();
+        MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(point);
-        markerOptions.icon(DJIBitmapDescriptorFactory.fromResource(R.drawable.add_marks));
-        DJIMarker marker = djiMap.addMarker(markerOptions);
+        markerOptions.icon( BitmapDescriptorFactory.fromResource(R.drawable.add_marks));
+        Marker marker = aMap.addMarker(markerOptions);
         mMarkers.put(mMarkers.size(), marker);
     }
     // 航线飞行的参数设置。
@@ -1063,7 +1056,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 //            setResultToToast("Set Waypoint attitude successfully");
         }
 
-        WaypointMissionOperator WNOinstance = GetProductApplication.getWaypointMissionOperator();
+        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
         DJIError error = WNOinstance.loadMission(waypointMissionBuilder.build());
 //        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         if (error == null) {
@@ -1081,7 +1074,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 //        if (getWaypointMissionOperator() != null) {
 //            getWaypointMissionOperator().addListener(eventNotificationListener);
 //        }
-        WaypointMissionOperator WNOinstance = GetProductApplication.getWaypointMissionOperator();
+        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
         if (WNOinstance != null) {
             WNOinstance.addListener(eventNotificationListener);
         }
@@ -1090,7 +1083,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 //        if (getWaypointMissionOperator() != null) {
 //            getWaypointMissionOperator().removeListener(eventNotificationListener);
 //        }
-        WaypointMissionOperator WNOinstance = GetProductApplication.getWaypointMissionOperator();
+        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
         if (WNOinstance != null) {
             WNOinstance.removeListener(eventNotificationListener);
         }
@@ -1115,9 +1108,8 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         }
     };
     private void uploadWayPointMission() {
-        WaypointMissionOperator WNOinstance = GetProductApplication.getWaypointMissionOperator();
-        WNOinstance.uploadMission( new CommonCallbacks.CompletionCallback() {
-//            getWaypointMissionOperator().uploadMission( new CommonCallbacks.CompletionCallback() {
+//        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
+        getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 if (error == null) {
@@ -1127,15 +1119,15 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                     Toast.makeText( CompleteWidgetActivity.this, "任务上传失败："
                                     + error.getDescription() + " retrying...",
                             Toast.LENGTH_SHORT ).show();
-//                    WNOinstance.retryUploadMission( null );
-//                    getWaypointMissionOperator().retryUploadMission( null );
+                    getWaypointMissionOperator().retryUploadMission(null);
                 }
             }
-        } );
+        });
+
     }
 
     private void startWaypointMission(){
-        WaypointMissionOperator WNOinstance = GetProductApplication.getWaypointMissionOperator();
+        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
         WNOinstance.startMission(new CommonCallbacks.CompletionCallback() {
 //        getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
             @Override
@@ -1147,7 +1139,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     }
 
     private void stopWaypointMission(){
-            WaypointMissionOperator WNOinstance = GetProductApplication.getWaypointMissionOperator();
+            WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
 //          getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
             WNOinstance.stopMission(new CommonCallbacks.CompletionCallback() {
             @Override
@@ -1191,12 +1183,12 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        mapWidget.onResume();
+        mapView.onResume();
     }
 
     @Override
     protected void onPause() {
-        mapWidget.onPause();
+        mapView.onPause();
         super.onPause();
     }
 
@@ -1229,7 +1221,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 
     @Override
     protected void onDestroy() {
-        mapWidget.onDestroy();
+        mapView.onDestroy();
         // Prevent memory leak by releasing DJISDKManager's references to this activity
         if (DJISDKManager.getInstance() != null) {
             DJISDKManager.getInstance().destroy();
@@ -1242,13 +1234,13 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapWidget.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapWidget.onLowMemory();
+        mapView.onLowMemory();
     }
 
     private class ResizeAnimation extends Animation {
