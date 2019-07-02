@@ -2,4 +2,6 @@
 *.temp
 *.apk
 \WarFul\app\src\main\AndroidManifest.xml
+
+\WayFul\app\build
 AndroidManifest.xml

@@ -47,14 +47,14 @@ import com.dji.ImportSDKDemo.Fragments.Fragment2;
 import com.dji.ImportSDKDemo.Fragments.Fragment3;
 import com.dji.ImportSDKDemo.Fragments.Fragment4;
 
-import com.dji.mapkit.maps.DJIMap;
-import com.dji.mapkit.maps.camera.DJICameraUpdate;
-import com.dji.mapkit.maps.camera.DJICameraUpdateFactory;
-import com.dji.mapkit.models.DJIBitmapDescriptorFactory;
-import com.dji.mapkit.models.DJICameraPosition;
-import com.dji.mapkit.models.DJILatLng;
-import com.dji.mapkit.models.annotations.DJIMarker;
-import com.dji.mapkit.models.annotations.DJIMarkerOptions;
+//import com.dji.mapkit.maps.DJIMap;
+//import com.dji.mapkit.maps.camera.DJICameraUpdate;
+//import com.dji.mapkit.maps.camera.DJICameraUpdateFactory;
+//import com.dji.mapkit.models.DJIBitmapDescriptorFactory;
+//import com.dji.mapkit.models.DJICameraPosition;
+//import com.dji.mapkit.models.DJILatLng;
+//import com.dji.mapkit.models.annotations.DJIMarker;
+//import com.dji.mapkit.models.annotations.DJIMarkerOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +79,8 @@ import dji.sdk.sdkmanager.DJISDKManager;
 import dji.ux.widget.MapWidget;
 
 import static com.dji.ImportSDKDemo.GetProductApplication.getWaypointMissionOperator;
+import com.dji.ImportSDKDemo.CircleMenuLayout;
+import com.dji.ImportSDKDemo.CircleMenuLayout.OnMenuItemClickListener;
 
 
 /** Activity that shows all the UI elements together */
@@ -130,17 +132,20 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
 
     // 导航栏部分
-    private LinearLayout ll_allview = null;
-//    private DrawerLayout ll_allview = null;
     private TabLayout tabLayout = null;
     private ViewPager vp_pager;
 //    private AutofitViewPager vp_pager;
     private List<Fragment> fragments;
     private String[] titles;
 
-    // 简洁操作界面部分
-    private Button btnFire, btnMoreMode;
-    private LinearLayout ll_simpleview = null;
+    // 圆形菜单部分 2019.07.03
+    private CircleMenuLayout mCircleMenuLayout;
+    private String[] mItemTexts = new String[] { "安全中心 ", "特色服务", "投资理财",
+            "转账汇款", "我的账户", "信用卡" };
+    private int[] mItemImgs = new int[] { R.drawable.home_mbank_1_normal,
+            R.drawable.home_mbank_2_normal, R.drawable.home_mbank_3_normal,
+            R.drawable.home_mbank_4_normal, R.drawable.home_mbank_5_normal,
+            R.drawable.home_mbank_6_normal };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,23 +173,27 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
             }
         } );
 
-        btnFire = (Button)findViewById( R.id.ico_fire );
-        btnFire.setOnClickListener( new View.OnClickListener() {
+
+        mCircleMenuLayout = (CircleMenuLayout) findViewById(R.id.id_menulayout);
+        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts);
+        mCircleMenuLayout.setOnMenuItemClickListener(new OnMenuItemClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                onClick( btnFire );
+            public void itemClick(View view, int pos)
+            {
+                Toast.makeText(CompleteWidgetActivity.this, mItemTexts[pos],
+                        Toast.LENGTH_SHORT).show();
             }
-        } );
-        btnMoreMode = (Button)findViewById( R.id.ico_more );
-        btnMoreMode.setOnClickListener( new View.OnClickListener() {
+
             @Override
-            public void onClick(View v) {
-                onClick( btnMoreMode );
-            }
-        } );
-//        ll_allview = (DrawerLayout)findViewById( R.id.all_view ) ;
-        ll_allview = (LinearLayout)findViewById( R.id.all_view ) ;
-        ll_simpleview = (LinearLayout)findViewById( R.id.simple_view );
+            public void itemCenterClick(View view)
+            {
+                Toast.makeText(CompleteWidgetActivity.this,
+                        "you can do something just like ccb  ",
+                        Toast.LENGTH_SHORT).show();
+           }
+        });
+//        原文：https://blog.csdn.net/lmj623565791/article/details/43131133
 
         initMainUI();   // 为初始化刷新挂架状态的函数。
         initTabLayoutView();   // 导航栏初始化。
@@ -317,7 +326,8 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         fragments.add(new Fragment2());
         fragments.add(new Fragment3());
         fragments.add(new Fragment4());
-        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" ).setIcon( getDrawable( R.drawable.alert_icon ) );
+//        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" ).setIcon( getDrawable( R.drawable.alert_icon ) );
+        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" );
         TabLayout.Tab tab2 = tabLayout.newTab().setText( "发射操作" );
         TabLayout.Tab tab3 = tabLayout.newTab().setText( "航线飞行" );
         TabLayout.Tab tab4 = tabLayout.newTab().setText( "更多功能" );
@@ -335,7 +345,6 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
         linearLayout.setDividerDrawable( ContextCompat.getDrawable(this,
                 R.drawable.divide_vitercle));
-//        ll_allview.openDrawer( Gravity.RIGHT);//侧滑打开  不设置则不会默认打开
     }
 //
     public class MyAdapter extends FragmentPagerAdapter {
@@ -379,9 +388,6 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 break;
             case R.id.btnSimpleMode:
                 Toast.makeText( getApplicationContext(), "敬请关注……", Toast.LENGTH_SHORT ).show();
-//                ll_allview.setVisibility( View.GONE );
-////                ll_allview.closeDrawer(Gravity.RIGHT);;
-//                ll_simpleview.setVisibility( View.VISIBLE );
                 break;
             case R.id.btnFireAllMode:
                 onFireClick();
@@ -426,7 +432,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 break;
             case R.id.btnDownActive:
                 onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
-                SystemClock.sleep(1000);  // 等待下行数据。
+//                SystemClock.sleep(1000);  // 等待下行数据。
                 for(int i=0;i<dataUp.length/2;i++)
                     dataUp[2*i+1] = 0X05;
                 onDataFromMSDKToOSDK( dataUp );
@@ -575,11 +581,6 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
             ResizeAnimation mapViewAnimation = new ResizeAnimation( mapView, width, height, deviceWidth, deviceHeight, 0 );
             mapView.startAnimation( mapViewAnimation );
             isMapMini = false;
-        } else if (view == btnFire) {    // 发射操作
-            onFireClick();
-        }else if (view == btnMoreMode) {    // 打开完全功能界面
-            Toast.makeText( getApplicationContext(), "切换到完全功能模式", Toast.LENGTH_SHORT ).show();
-
         }
     }
 
@@ -654,6 +655,9 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 onDataFromMSDKToOSDK(dataUp);
 //                FireButton.setBackgroundColor( getColor( R.color.red ) );
 //                FireButton.setEnabled( true );    // 激活<发射>按钮。
+                for(int i=0;i<cbChecked.length;i++) {
+                    cb[i].setChecked( false );
+                }
             }
         });
         builder.setNeutralButton("调整盖板",new DialogInterface.OnClickListener(){
@@ -662,6 +666,9 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
             {
                 setDataUp(cbChecked,6);    // public void setDataUp(boolean [] cbChecked,int flag)
                 onDataFromMSDKToOSDK(dataUp);
+                for(int i=0;i<cbChecked.length;i++) {
+                    cb[i].setChecked( false );
+                }
             }
         });
         builder.setNegativeButton("取消",new DialogInterface.OnClickListener(){
@@ -683,7 +690,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         status[i] = data[2 * i + 1];   // 只取状态位
 
         for (int i = 0; i < status.length; i++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，status只截取了其状态位。
-        switch (status[k])    // 第二位是状态。。
+        switch (status[i])    // 第二位是状态。。
         {
             case 0X00:                bomb_status = "无  弹  ";                break;  // bomb_empty
             case 0X01:                bomb_status = "无  弹  ";                break;  // bomb_empty_open

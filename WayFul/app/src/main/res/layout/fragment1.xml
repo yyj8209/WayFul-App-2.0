@@ -10,8 +10,9 @@
 
     <Button
         android:id = "@+id/btnDispStatus"
-        android:layout_width="@dimen/button_width4"
-        android:layout_height="@dimen/button_heigth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="@dimen/button_txtsize"
         android:background="@drawable/corner_blue_btn"
         android:textColor="@color/white"
@@ -19,8 +20,9 @@
 
     <Button
         android:id = "@+id/btnHideStatus"
-        android:layout_width="@dimen/button_width4"
-        android:layout_height="@dimen/button_heigth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="@dimen/button_txtsize"
         android:background="@drawable/corner_blue_btn"
         android:textColor="@color/white"
@@ -28,8 +30,9 @@
 
     <Button
         android:id = "@+id/btnSimpleMode"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_heigth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="@dimen/button_txtsize"
         android:background="@drawable/corner_blue_btn"
         android:textColor="@color/white"

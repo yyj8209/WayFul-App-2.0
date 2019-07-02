@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.dji.ImportSDKDemo.R;
 
@@ -18,40 +19,40 @@ import com.dji.ImportSDKDemo.R;
 public class Fragment2 extends Fragment {
 
     private SendMessageCommunitor sendMessage;
-    Button btn3,btn4;
+    Button btn1,btn2;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate( R.layout.fragment2,container,false);
-        btn3 = view.findViewById( R.id.btnFireAllMode);
-        btn4 = view.findViewById( R.id.btnTrim);
-        btn3.setOnClickListener( new View.OnClickListener() {
+        btn1 = view.findViewById( R.id.btnTrim);
+        btn2 = view.findViewById( R.id.btnFireAllMode);
+        btn1.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage.sendMessage( btn3.getId() );
-//                Toast.makeText( getActivity(),"点击第一个按钮",Toast.LENGTH_SHORT ).show();
+                sendMessage.sendMessage( btn1.getId() );
+//                Toast.makeText( getActivity(),"点击微调按钮",Toast.LENGTH_SHORT ).show();
             }
         } );
-        btn4.setOnClickListener( new View.OnClickListener() {
+        btn2.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMessage.sendMessage( btn4.getId() );
-//                Toast.makeText( getActivity(),"点击第一个按钮",Toast.LENGTH_SHORT ).show();
+                sendMessage.sendMessage( btn2.getId() );
+//                Toast.makeText( getActivity(),"点击第发射按钮",Toast.LENGTH_SHORT ).show();
             }
         } );
         return view;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-//        Log.d(TAG, "onActivityCreated");
-        if(savedInstanceState != null) {
-//            Log.d(TAG, "saved variable number: " + savedInstanceState.getInt("number"));
-
-        }
-        super.onActivityCreated(savedInstanceState);
-    }
+//    @Override
+//    public void onActivityCreated(Bundle savedInstanceState) {
+////        Log.d(TAG, "onActivityCreated");
+//        if(savedInstanceState != null) {
+////            Log.d(TAG, "saved variable number: " + savedInstanceState.getInt("number"));
+//
+//        }
+//        super.onActivityCreated(savedInstanceState);
+//    }
 
 //接口回调
     /**

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:custom="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/light_gray"
-    android:id="@+id/root_view"
+    android:visibility="visible"
     tools:context="com.dji.ImportSDKDemo.CompleteWidgetActivity">
 
     <!-- Widget to see first person view (FPV) -->
@@ -15,12 +15,13 @@
         android:id="@+id/fpv_widget"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
 
     <dji.ux.widget.FPVOverlayWidget
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="visible" />
 
     <!--<dji.ux.widget.MapWidget-->
     <com.amap.api.maps2d.MapView
@@ -28,13 +29,13 @@
         android:layout_width="141dp"
         android:layout_height="91dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="10dp"
-        android:layout_marginRight="10dp" />
+        android:layout_marginEnd="10dp" />
 
     <dji.ux.workflow.CompassCalibratingWorkFlow
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
     <dji.ux.workflow.CameraSensorCleaningWorkFlow
         android:layout_width="match_parent"
@@ -52,46 +53,46 @@
 
         <dji.ux.widget.PreFlightStatusWidget
             android:layout_width="238dp"
-            android:layout_height="25dp"/>
+            android:layout_height="25dp" />
 
         <dji.ux.widget.FlightModeWidget
             android:layout_width="103dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.GPSSignalWidget
             android:layout_width="44dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.VisionWidget
             android:layout_width="22dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.RemoteControlSignalWidget
             android:layout_width="38dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.VideoSignalWidget
             android:layout_width="38dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.BatteryWidget
             android:layout_width="96dp"
             android:layout_height="22dp"
-            custom:excludeView="singleVoltage"/>
+            custom:excludeView="singleVoltage" />
 
         <dji.ux.widget.ConnectionWidget
-            android:layout_marginTop="3dp"
             android:layout_width="18dp"
-            android:layout_height="18dp"/>
+            android:layout_height="18dp"
+            android:layout_marginTop="3dp" />
     </LinearLayout>
 
     <!-- 剩余飞行时间-->
     <dji.ux.widget.RemainingFlightTimeWidget
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="18dp"
-        android:layout_width="match_parent"
-        android:background="@color/transparent"
-        android:layout_height="20dp"/>
+        android:background="@color/transparent" />
 
     <!-- 弹仓显示部分-->
     <GridLayout
@@ -99,8 +100,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/signal"
-        android:layout_marginLeft="10dp"
-        android:layout_weight="5"
+        android:layout_marginStart="10dp"
         android:background="@drawable/corner_component"
         android:columnCount="4"
         android:orientation="vertical"
@@ -113,52 +113,56 @@
             style="@style/pyloncheckbox1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="1 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="1 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <CheckBox
             android:id="@+id/checkbox2"
             style="@style/pyloncheckbox2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="2 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="2 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <CheckBox
             android:id="@+id/checkbox3"
             style="@style/pyloncheckbox3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="3 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="3 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <CheckBox
             android:id="@+id/checkbox4"
             style="@style/pyloncheckbox4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="4 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="4 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <!-- 5号弹状态及控制 -->
         <CheckBox
@@ -166,62 +170,66 @@
             style="@style/pyloncheckbox5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="5 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="5 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <CheckBox
             android:id="@+id/checkbox6"
             style="@style/pyloncheckbox6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="6 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="6 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <CheckBox
             android:id="@+id/checkbox7"
             style="@style/pyloncheckbox7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="7 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="7 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
 
         <CheckBox
             android:id="@+id/checkbox8"
             style="@style/pyloncheckbox8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
         <TextView
-            android:text="8 号"
-            android:textSize="12dp"
-            android:layout_gravity="center"
-            android:textColor="@color/ind_red"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="8 号"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
     </GridLayout>
 
     <!-- 完全功能操作界面 TabLayout-->
     <LinearLayout
+        android:id="@+id/all_view"
         android:layout_width="@dimen/tab_width"
         android:layout_height="70dp"
-        android:id = "@+id/all_view"
         android:layout_alignEnd="@id/map_widget"
-        android:background="@drawable/corner_component"
         android:layout_below="@id/signal"
+        android:background="@drawable/corner_component"
         android:orientation="vertical">
 
         <android.support.design.widget.TabLayout
@@ -241,34 +249,38 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@drawable/corner_component"/>
+            android:background="@drawable/corner_component" />
     </LinearLayout>
 
     <!-- 简洁操作界面 Button-->
-    <LinearLayout
-        android:layout_width="140dp"
-        android:layout_height="70dp"
-        android:id = "@+id/simple_view"
+    <com.dji.ImportSDKDemo.CircleMenuLayout
+        android:id="@+id/id_menulayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignEnd="@id/map_widget"
         android:layout_below="@id/signal"
-        android:layout_marginTop="5dp"
-        android:visibility="gone"
-        android:orientation="horizontal">
-        <Button
+        android:background="@drawable/circle_bg3"
+        android:padding="100dp">
+
+        <RelativeLayout
+            android:id="@id/id_circle_menu_item_center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id = "@+id/ico_fire"
-            android:padding="2dp"
-            android:text="发射"
-            android:src="@drawable/fire"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id = "@+id/ico_more"
-            android:padding="2dp"
-            android:text="切换到完全界面"
-            android:src="@drawable/more"/>
-    </LinearLayout>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="104.0dip"
+                android:layout_height="104.0dip"
+                android:layout_centerInParent="true"
+                android:background="@drawable/turnplate_center_unlogin" />
+
+            <ImageView
+                android:layout_width="116.0dip"
+                android:layout_height="116.0dip"
+                android:layout_centerInParent="true"
+                android:background="@drawable/turnplate_mask_unlogin_normal" />
+        </RelativeLayout>
+    </com.dji.ImportSDKDemo.CircleMenuLayout>
+
     <!-- 罗盘界面-->
     <LinearLayout
         android:layout_width="match_parent"
@@ -290,24 +302,24 @@
         android:id="@+id/TakeOffReturnPanel"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
         android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
         android:layout_marginBottom="95dp"
+        android:layout_marginStart="10dp"
         android:orientation="vertical">
 
         <dji.ux.widget.TakeOffWidget
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="0dp"/>
+            android:layout_marginBottom="0dp" />
 
         <dji.ux.widget.ReturnHomeWidget
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp" />
     </LinearLayout>
 
-<!--
+    <!--
 
     <dji.ux.widget.controls.PictureVideoSwitch
         android:id="@+id/CameraCapturePanel1"
@@ -337,7 +349,7 @@
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/signal"
-        custom:excludeItem="ESCStatus"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        custom:excludeItem="ESCStatus" />
 
 </RelativeLayout>

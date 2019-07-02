@@ -15,7 +15,7 @@ public class MApplication extends Application {
         super.attachBaseContext(paramContext);
         Helper.install(MApplication.this);
 
-        LitePal.initialize(this);   // 配置数据库。2018.11.27
+//        LitePal.initialize(this);   // 配置数据库。2018.11.27
 
         // 为添加getProductApplication而增加的代码。2018.11.14
         if (getProductApplication == null) {

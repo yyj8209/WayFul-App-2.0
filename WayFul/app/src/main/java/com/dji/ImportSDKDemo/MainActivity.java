@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,7 +38,9 @@ import dji.common.error.DJISDKError;
 import dji.common.useraccount.UserAccountState;
 import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
+import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
 
@@ -57,6 +60,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         //我又电脑里找到前几天编译的可以正常注册的app，奇怪的是，还不注册。
         // 我休息了十分钟，可以注册了。
         // 结论：是网络不稳定。2019.02.18
+        // 结论：是大疆的服务器不稳定。2019.06.29
         @Override
         public void onRegister(DJIError error) {
             isRegistrationInProgress.set(false);
@@ -76,7 +80,38 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
 
         @Override
-        public void onProductChange(BaseProduct djiBaseProduct, BaseProduct djiBaseProduct1) {
+        public void onProductDisconnect() {
+            Log.d("TAG", "onProductDisconnect");
+//            notifyStatusChange();
+        }
+        @Override
+        public void onProductConnect(BaseProduct baseProduct) {
+            Log.d( "TAG", String.format( "onProductConnect newProduct:%s", baseProduct ) );
+//            notifyStatusChange();
+        }
+        @Override
+        public void onComponentChange(BaseProduct.ComponentKey componentKey, BaseComponent oldComponent,
+                                      BaseComponent newComponent) {
+            if (newComponent != null) {
+                newComponent.setComponentListener(new BaseComponent.ComponentListener() {
+
+                    @Override
+                    public void onConnectivityChange(boolean isConnected) {
+                        Log.d("TAG", "onComponentConnectivityChanged: " + isConnected);
+//                        notifyStatusChange();
+                    }
+                });
+            }
+
+            Log.d("TAG",
+                    String.format("onComponentChange key:%s, oldComponent:%s, newComponent:%s",
+                            componentKey,
+                            oldComponent,
+                            newComponent));
+
+        }        @Override
+        public void onInitProcess(DJISDKInitEvent djisdkInitEvent, int i) {
+
         }
     };
     private static final String[] REQUIRED_PERMISSION_LIST = new String[] {

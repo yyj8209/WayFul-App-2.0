@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="3dp"
     android:orientation="horizontal">
 
     <Button
         android:id="@+id/btnTrim"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_heigth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="弹仓开关微调"
         android:background="@drawable/corner_blue_btn"
         android:textColor="@color/white"
@@ -16,8 +17,9 @@
 
     <Button
         android:id="@+id/btnFireAllMode"
-        android:layout_width="60dp"
-        android:layout_height="@dimen/button_heigth"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:layout_marginLeft="20dp"
         android:text="发射"
         android:background="@drawable/corner_red_btn"
