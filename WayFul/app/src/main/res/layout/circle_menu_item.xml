@@ -17,7 +17,7 @@
         android:visibility="visible"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
-        android:text="保险"
+        android:text="  "
         android:textSize="14.0dip" />
 
 </LinearLayout>

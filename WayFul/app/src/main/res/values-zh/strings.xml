@@ -1,0 +1,33 @@
+<resources>
+    <string name = "app_name">防暴平台</string>
+    <string name="registerring">正在注册…</string>
+    <string name="launguage">中文/EN</string>
+    <string name="start">进入程序</string>
+    <string name="a_pylon">1 号</string>
+    <string name="b_pylon">2 号</string>
+    <string name="c_pylon">3 号</string>
+    <string name="d_pylon">4 号</string>
+    <string name="e_pylon">5 号</string>
+    <string name="f_pylon">6 号</string>
+    <string name="g_pylon">7 号</string>
+    <string name="h_pylon">8 号</string>
+    <string name="status_refresh">状态更新</string>
+    <string name="focus">一键瞄准</string>
+    <string name="pylon_on">弹仓显示</string>
+    <string name="pylon_off">弹仓隐藏</string>
+    <string name="light">打开照明</string>
+    <string name="blink">打开闪光</string>
+    <string name="shout">打开喊话</string>
+    <string name="light_on">关闭照明</string>
+    <string name="blink_on">关闭闪光</string>
+    <string name="shout_on">关闭喊话</string>
+    <string name="reserved">保留升级</string>
+    <string name="current_status">当前挂架状态</string>
+    <string name="title_activity_pylons_widget">PylonsWidgetActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="column_name">Name</string>
+    <string name="column_type">Type</string>
+    <string name="column_nullable">Nullable</string>
+    <string name="column_unique">Unique</string>
+    <string name="column_default">Default</string>
+</resources>

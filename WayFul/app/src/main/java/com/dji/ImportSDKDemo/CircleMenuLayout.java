@@ -1,6 +1,7 @@
 package com.dji.ImportSDKDemo;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -32,7 +33,7 @@ public class CircleMenuLayout extends ViewGroup
 	/**
 	 * 该容器的内边距,无视padding属性，如需边距请用该变量
 	 */
-	private static final float RADIO_PADDING_LAYOUT = 1 / 12f;
+	private static final float RADIO_PADDING_LAYOUT = 1 / 20f;    // 1 / 16f;
 
 	/**
 	 * 当每秒移动角度达到该值时，认为是快速移动
@@ -239,14 +240,12 @@ public class CircleMenuLayout extends ViewGroup
 			float tmp = layoutRadius / 2f - cWidth / 2 - mPadding;
 
 			// tmp cosa 即menu item中心点的横坐标
-			left = layoutRadius
-					/ 2
+			left = layoutRadius / 2
 					+ (int) Math.round(tmp
 							* Math.cos(Math.toRadians(mStartAngle)) - 1 / 2f
 							* cWidth);
 			// tmp sina 即menu item的纵坐标
-			top = layoutRadius
-					/ 2
+			top = layoutRadius / 2
 					+ (int) Math.round(tmp
 							* Math.sin(Math.toRadians(mStartAngle)) - 1 / 2f
 							* cWidth);
@@ -294,86 +293,86 @@ public class CircleMenuLayout extends ViewGroup
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event)
 	{
-		float x = event.getX();
-		float y = event.getY();
-
-		// Log.e("TAG", "x = " + x + " , y = " + y);
-
-		switch (event.getAction())
-		{
-		case MotionEvent.ACTION_DOWN:
-
-			mLastX = x;
-			mLastY = y;
-			mDownTime = System.currentTimeMillis();
-			mTmpAngle = 0;
-
-			// 如果当前已经在快速滚动
-			if (isFling)
-			{
-				// 移除快速滚动的回调
-				removeCallbacks(mFlingRunnable);
-				isFling = false;
-				return true;
-			}
-
-			break;
-		case MotionEvent.ACTION_MOVE:
-
-			/**
-			 * 获得开始的角度
-			 */
-			float start = getAngle(mLastX, mLastY);
-			/**
-			 * 获得当前的角度
-			 */
-			float end = getAngle(x, y);
-
-			// Log.e("TAG", "start = " + start + " , end =" + end);
-			// 如果是一、四象限，则直接end-start，角度值都是正值
-			if (getQuadrant(x, y) == 1 || getQuadrant(x, y) == 4)
-			{
-				mStartAngle += end - start;
-				mTmpAngle += end - start;
-			} else
-			// 二、三象限，色角度值是付值
-			{
-				mStartAngle += start - end;
-				mTmpAngle += start - end;
-			}
-			// 重新布局
-			requestLayout();
-
-			mLastX = x;
-			mLastY = y;
-
-			break;
-		case MotionEvent.ACTION_UP:
-
-			// 计算，每秒移动的角度
-			float anglePerSecond = mTmpAngle * 1000
-					/ (System.currentTimeMillis() - mDownTime);
-
-			// Log.e("TAG", anglePrMillionSecond + " , mTmpAngel = " +
-			// mTmpAngle);
-
-			// 如果达到该值认为是快速移动
-			if (Math.abs(anglePerSecond) > mFlingableValue && !isFling)
-			{
-				// post一个任务，去自动滚动
-				post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
-
-				return true;
-			}
-
-			// 如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
-			if (Math.abs(mTmpAngle) > NOCLICK_VALUE)
-			{
-				return true;
-			}
-
-			break;
-		}
+//		float x = event.getX();
+//		float y = event.getY();
+//
+//		// Log.e("TAG", "x = " + x + " , y = " + y);
+//
+//		switch (event.getAction())
+//		{
+//		case MotionEvent.ACTION_DOWN:
+//
+//			mLastX = x;
+//			mLastY = y;
+//			mDownTime = System.currentTimeMillis();
+//			mTmpAngle = 0;
+//
+//			// 如果当前已经在快速滚动
+//			if (isFling)
+//			{
+//				// 移除快速滚动的回调
+//				removeCallbacks(mFlingRunnable);
+//				isFling = false;
+//				return true;
+//			}
+//
+//			break;
+//		case MotionEvent.ACTION_MOVE:
+//
+//			/**
+//			 * 获得开始的角度
+//			 */
+//			float start = getAngle(mLastX, mLastY);
+//			/**
+//			 * 获得当前的角度
+//			 */
+//			float end = getAngle(x, y);
+//
+//			// Log.e("TAG", "start = " + start + " , end =" + end);
+//			// 如果是一、四象限，则直接end-start，角度值都是正值
+//			if (getQuadrant(x, y) == 1 || getQuadrant(x, y) == 4)
+//			{
+//				mStartAngle += end - start;
+//				mTmpAngle += end - start;
+//			} else
+//			// 二、三象限，色角度值是付值
+//			{
+//				mStartAngle += start - end;
+//				mTmpAngle += start - end;
+//			}
+//			// 重新布局
+//			requestLayout();
+//
+//			mLastX = x;
+//			mLastY = y;
+//
+//			break;
+//		case MotionEvent.ACTION_UP:
+//
+//			// 计算，每秒移动的角度
+//			float anglePerSecond = mTmpAngle * 1000
+//					/ (System.currentTimeMillis() - mDownTime);
+//
+//			// Log.e("TAG", anglePrMillionSecond + " , mTmpAngel = " +
+//			// mTmpAngle);
+//
+//			// 如果达到该值认为是快速移动
+//			if (Math.abs(anglePerSecond) > mFlingableValue && !isFling)
+//			{
+//				// post一个任务，去自动滚动
+//				post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
+//
+//				return true;
+//			}
+//
+//			// 如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
+//			if (Math.abs(mTmpAngle) > NOCLICK_VALUE)
+//			{
+//				return true;
+//			}
+//
+//			break;
+//		}
 		return super.dispatchTouchEvent(event);
 	}
 
@@ -383,7 +382,7 @@ public class CircleMenuLayout extends ViewGroup
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		return true;
+		return false;
 	}
 
 	/**
@@ -498,6 +497,8 @@ public class CircleMenuLayout extends ViewGroup
 			if (tv != null)
 			{
 				tv.setVisibility(View.VISIBLE);
+				tv.setTextSize( 10 );
+				tv.setTextColor( Color.BLUE );
 				tv.setText(mItemTexts[i]);
 			}
 

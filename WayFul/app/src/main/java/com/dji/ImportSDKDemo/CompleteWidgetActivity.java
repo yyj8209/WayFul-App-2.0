@@ -3,13 +3,24 @@ package com.dji.ImportSDKDemo;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.media.SoundPool;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
+//import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -34,27 +45,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.Marker;
-import com.amap.api.maps2d.model.MarkerOptions;
+//import com.amap.api.maps2d.AMap;
+//import com.amap.api.maps2d.CameraUpdate;
+//import com.amap.api.maps2d.CameraUpdateFactory;
+//import com.amap.api.maps2d.MapView;
+//import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+//import com.amap.api.maps2d.model.LatLng;
+//import com.amap.api.maps2d.model.Marker;
+//import com.amap.api.maps2d.model.MarkerOptions;
 
-import com.dji.ImportSDKDemo.Fragments.Fragment1;
-import com.dji.ImportSDKDemo.Fragments.Fragment2;
-import com.dji.ImportSDKDemo.Fragments.Fragment3;
-import com.dji.ImportSDKDemo.Fragments.Fragment4;
-
-//import com.dji.mapkit.maps.DJIMap;
-//import com.dji.mapkit.maps.camera.DJICameraUpdate;
-//import com.dji.mapkit.maps.camera.DJICameraUpdateFactory;
-//import com.dji.mapkit.models.DJIBitmapDescriptorFactory;
-//import com.dji.mapkit.models.DJICameraPosition;
-//import com.dji.mapkit.models.DJILatLng;
-//import com.dji.mapkit.models.annotations.DJIMarker;
-//import com.dji.mapkit.models.annotations.DJIMarkerOptions;
+//import com.dji.ImportSDKDemo.Fragments.Fragment1;
+//import com.dji.ImportSDKDemo.Fragments.Fragment2;
+//import com.dji.ImportSDKDemo.Fragments.Fragment3;
+//import com.dji.ImportSDKDemo.Fragments.Fragment4;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +66,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
+import dji.common.gimbal.GimbalMode;
+import dji.common.gimbal.MovementSettings;
+import dji.common.gimbal.Rotation;
+import dji.common.gimbal.RotationMode;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
@@ -72,80 +79,109 @@ import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 import dji.common.util.CommonCallbacks;
+import dji.midware.data.model.P3.DataFlycUploadWayPointMissionMsg;
+import dji.sdk.base.BaseProduct;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
+import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.ux.widget.MapWidget;
 
+import static android.view.View.VISIBLE;
+import static android.view.View.INVISIBLE;
+import static com.dji.ImportSDKDemo.GetProductApplication.getProductInstance;
 import static com.dji.ImportSDKDemo.GetProductApplication.getWaypointMissionOperator;
+
+//import com.amap.api.maps2d.model.BitmapDescriptorFactory;
+//import com.amap.api.maps2d.model.CameraPosition;
+//import com.amap.api.maps2d.model.LatLng;
+//import com.amap.api.maps2d.model.Marker;
+//import com.amap.api.maps2d.model.MarkerOptions;
 import com.dji.ImportSDKDemo.CircleMenuLayout;
 import com.dji.ImportSDKDemo.CircleMenuLayout.OnMenuItemClickListener;
-
+import com.dji.mapkit.core.camera.DJICameraUpdate;
+import com.dji.mapkit.core.camera.DJICameraUpdateFactory;
+import com.dji.mapkit.core.maps.DJIMap;
+import com.dji.mapkit.core.models.DJIBitmapDescriptorFactory;
+import com.dji.mapkit.core.models.DJILatLng;
+import com.dji.mapkit.core.models.annotations.DJIMarker;
+import com.dji.mapkit.core.models.annotations.DJIMarkerOptions;
+import dji.sdk.gimbal.Gimbal;
 
 /** Activity that shows all the UI elements together */
-public class CompleteWidgetActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener
-                                                                            ,Fragment1.SendMessageCommunitor
-                                                                            ,Fragment2.SendMessageCommunitor
-                                                                            ,Fragment3.SendMessageCommunitor
-                                                                            ,Fragment4.SendMessageCommunitor
+public class CompleteWidgetActivity extends FragmentActivity  implements CompoundButton.OnCheckedChangeListener
+//public class CompleteWidgetActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener
+//                                                                            ,Fragment1.SendMessageCommunitor
+//                                                                            ,Fragment2.SendMessageCommunitor
+//                                                                            ,Fragment3.SendMessageCommunitor
+//                                                                            ,Fragment4.SendMessageCommunitor
 {
 
     protected static final String TAG_COM = "CompleteWidgetActivity";
     public static final int PYLON_NUM = 8;
 
-//    private MapWidget mapWidget;
-    private ViewGroup parentView,vStatus;
+    private MapWidget mapWidget;
+    private DJIMap aMap;
+    private ViewGroup parentView;
     private View fpvWidget;
     private boolean isMapMini = true;
-
-    // 一共是八个图标，对应八种状态。
-    private CheckBox [] cb = new CheckBox[PYLON_NUM];   // 测试复选框显示图片。
-    private boolean [] cbChecked = new boolean[PYLON_NUM];   // 判断是否选中。
-    private  byte[] dataDown,dataUp;
-    private int[] imagePath;
-    private ArrayList<String> sTemp = new ArrayList<String>();  // 临时的可变长度字符数组，存储发射准备和发射的挂架名。
-    private ArrayList<Integer> nTemp = new ArrayList<Integer>(); // 临时的可变长度整型数组，存储发射准备和发射的挂架号。
-    //    private ImageButton resizeButton;
-    private boolean isOriginalSize = true;
-
+    private Button btnExchangeView;
     private int height;
     private int width;
     private int margin;
     private int deviceWidth;
     private int deviceHeight;
 
+
+    // 一共是八个图标，对应八种状态。
+    private CheckBox [] cb = new CheckBox[PYLON_NUM];   // 测试复选框显示图片。
+    private boolean [] cbChecked = new boolean[PYLON_NUM];   // 判断是否选中。
+    private  byte[] dataDown,dataUp,dataDownOld;
+    private int[] imagePath;
+    private ArrayList<String> sTemp = new ArrayList<String>();  // 临时的可变长度字符数组，存储发射准备和发射的挂架名。
+    private ArrayList<Integer> nTemp = new ArrayList<Integer>(); // 临时的可变长度整型数组，存储发射准备和发射的挂架号。
+    private FlightController mFlightController;
+    private Gimbal mGimbal;
+
 //    // 航线飞行部分变量
-    private MapView mapView;
-    private AMap aMap;
-//    private DJIMap aMap;
-    private double droneLocationLat = 181, droneLocationLng = 181;   // 飞机位置。
-    private Marker droneMarker = null;
-    private boolean isAdd = false;
-    private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
-    private float altitude = 100.0f;
-    private float mSpeed = 10.0f;
-    private List<Waypoint> waypointList = new ArrayList<>();
-    public static WaypointMission.Builder waypointMissionBuilder;
-//    private WaypointMissionOperator WNOinstance;
-    private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
-    private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
+//    private MapWidget mapWidget;
+//    private AMap aMap;
+//    private double droneLocationLat = 181, droneLocationLng = 181;   // 飞机位置。
+//    private DJIMarker droneMarker = null;
+//    private boolean isAdd = false;
+//    private final Map<Integer, DJIMarker> mMarkers = new ConcurrentHashMap<Integer, DJIMarker>();
+//    private float altitude = 100.0f;
+//    private float mSpeed = 10.0f;
+//    private List<Waypoint> waypointList = new ArrayList<>();
+//    public static WaypointMission.Builder waypointMissionBuilder;
+//    private WaypointMissionOperator WMOinstance;
+//    private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
+//    private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
 
     // 导航栏部分
-    private TabLayout tabLayout = null;
-    private ViewPager vp_pager;
+//    private TabLayout tabLayout = null;
+//    private ViewPager vp_pager;
 //    private AutofitViewPager vp_pager;
-    private List<Fragment> fragments;
-    private String[] titles;
+//    private List<Fragment> fragments;
+//    private String[] titles;
 
     // 圆形菜单部分 2019.07.03
     private CircleMenuLayout mCircleMenuLayout;
-    private String[] mItemTexts = new String[] { "安全中心 ", "特色服务", "投资理财",
-            "转账汇款", "我的账户", "信用卡" };
-    private int[] mItemImgs = new int[] { R.drawable.home_mbank_1_normal,
-            R.drawable.home_mbank_2_normal, R.drawable.home_mbank_3_normal,
-            R.drawable.home_mbank_4_normal, R.drawable.home_mbank_5_normal,
-            R.drawable.home_mbank_6_normal };
+//    private String[] mItemTexts = new String[] { "激活下行 ", "新增航点", "上传航点",
+//            "清除航点", "航线飞行", "停止航飞", "更多设置" };
+    private String[] mItemTexts = new String[] { "@string/status_refresh ",
+        "@string/focus", "@string/pylon_on",
+        "@string/light_on", "@string/blink_on",
+        "@string/shout_on", "@string/reserved" };
+//    private int[] mItemImgs;
+    private int[] mItemImgs = new int[] { R.drawable.downchannel,
+            R.drawable.add, R.drawable.upload,
+            R.drawable.light, R.drawable.blink,
+            R.drawable.loudspeaker, R.drawable.settings };
+    private boolean bLight = false, bBlink = false, bShout = false;
+//            R.drawable.clear, R.drawable.start,
+//            R.drawable.stop, R.drawable.settings };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,16 +191,12 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 
         height = DensityUtil.dip2px( this, 100 );
         width = DensityUtil.dip2px( this, 150 );
-        margin = DensityUtil.dip2px( this, 12 );
-
+        margin = DensityUtil.dip2px( this, 10 );
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         deviceHeight = displayMetrics.heightPixels;
         deviceWidth = displayMetrics.widthPixels;
 
         parentView = (ViewGroup) findViewById( R.id.root_view );
-        vStatus = (ViewGroup) findViewById( R.id.status );
-
-        mapView = (MapView) findViewById( R.id.map_widget );
         fpvWidget = findViewById( R.id.fpv_widget );
         fpvWidget.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -173,75 +205,158 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
             }
         } );
 
+        mapWidget = (MapWidget) findViewById( R.id.map_widget );
+        mapWidget.initAMap(new MapWidget.OnMapReadyListener() {
+            @Override
+            public void onMapReady(@NonNull DJIMap map) {
+                map.setOnMapClickListener(new DJIMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(DJILatLng latLng) {
+                        onViewClick(mapWidget);
+                    }
+                });
+            }
+        });
+//        initMap();
+        mapWidget.onCreate( savedInstanceState );
+
+        btnExchangeView = (Button)findViewById( R.id.btn_exchng );
+        btnExchangeView.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exchangeView(isMapMini);
+            }
+        } );
+
+        initMainUI();   // 为初始化刷新挂架状态的函数。
+        updateImage(dataDown);    // 初始化和更新挂架状态的显示。2018.10.04
 
         mCircleMenuLayout = (CircleMenuLayout) findViewById(R.id.id_menulayout);
+        initCircleMenuUI(mCircleMenuLayout);
+        initCircleMenu(mCircleMenuLayout);
+
+        mFlightController = GetProductApplication.getFlightControllerInstance();
+//        initTabLayoutView();   // 导航栏初始化。
+//        onDataFromOnboardToMSDK();   // 设置接收下行数据的函数。
+//        addListener();    // 对添加航线飞行目标点的监视。    2019.2.9
+    }
+    // 初始化圆形菜单界面
+    private void initCircleMenuUI(CircleMenuLayout mCircleMenuLayout){
         mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts);
+    }
+    // 设置菜单的响应函数
+    private void initCircleMenu(final CircleMenuLayout mCircleMenuLayout){
+//        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts);
         mCircleMenuLayout.setOnMenuItemClickListener(new OnMenuItemClickListener()
         {
             @Override
             public void itemClick(View view, int pos)
             {
-                Toast.makeText(CompleteWidgetActivity.this, mItemTexts[pos],
-                        Toast.LENGTH_SHORT).show();
+// 菜单顺序(pos+1)：1状态更新，2一键瞄准，3弹仓显/隐，4打开/关闭照明，5打开/关闭喊话，6保留
+// ---------------------------- 指令协议 ----------------------------
+//                0X00	无操作	0X04	喊话
+//                0X01	照明	0X05	激活下行链路
+//                0X02	发射	0X06	关闭照明
+//                0X03	闪光	0X07	关闭喊话
+                switch (pos+1) {
+                    case 1:
+                        onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
+                        for (int i = 0; i < dataUp.length / 2; i++)
+                            dataUp[2 * i + 1] = 0X05;
+                        onDataFromMSDKToOSDK( dataUp );
+                        showProgressDialog();
+                        break;
+                    case 2:
+                        if(View.VISIBLE == findViewById( R.id.aim).getVisibility()){
+                            findViewById( R.id.aim).setVisibility( View.INVISIBLE );
+                            aimGimbal(false);   // 云台回到自由模式
+                        }
+                        else {
+                            findViewById( R.id.aim ).setVisibility( View.VISIBLE );
+                            aimGimbal(true);   // 云台锁定相机方向
+                        }
+
+                        break;
+                    case 3:
+                        if(View.VISIBLE == findViewById( R.id.status).getVisibility()) {
+                            findViewById( R.id.status ).setVisibility( View.INVISIBLE );
+                            mItemTexts[2] = "@string/pylon_on" ;
+                        }
+                        else {
+                            findViewById( R.id.status ).setVisibility( View.VISIBLE );
+                            mItemTexts[2] = "@string/pylon_off";
+                        }
+                        break;
+                    case 4:
+                        if(!bLight) {
+                            for (int i = 0; i < dataUp.length / 2; i++)
+                                dataUp[2 * i + 1] = 0X01;   // 照明
+//                            onDataFromMSDKToOSDK( dataUp );
+                            mItemTexts[3] = "@string/light_on";
+                            bLight = true;
+                        }
+                        else{
+                            for (int i = 0; i < dataUp.length / 2; i++)
+                                dataUp[2 * i + 1] = 0X06;   // 关闭照明
+//                            onDataFromMSDKToOSDK( dataUp );
+                            mItemTexts[3] = "@string/light_off";
+                            bLight = false;
+                        }
+                        break;
+                    case 5:
+                        if(!bBlink) {
+                            for (int i = 0; i < dataUp.length / 2; i++)
+                                dataUp[2 * i + 1] = 0X03;   // 闪光
+//                            onDataFromMSDKToOSDK( dataUp );
+                            mItemTexts[4] = "@string/light_on";
+                            bBlink = true;
+                        }
+                        else{
+                            for (int i = 0; i < dataUp.length / 2; i++)
+                                dataUp[2 * i + 1] = 0X03;   // 关闭闪光
+//                            onDataFromMSDKToOSDK( dataUp );
+                            mItemTexts[4] = "@string/light_off";
+                            bBlink = false;
+                        }
+                        break;
+                    case 6:
+                        if(!bShout) {
+                            for (int i = 0; i < dataUp.length / 2; i++)
+                                dataUp[2 * i + 1] = 0X04;   // 喊话
+//                            onDataFromMSDKToOSDK( dataUp );
+                            mItemTexts[5] = "@string/shout_on";
+                            bShout = true;
+                        }
+                        else{
+                            for (int i = 0; i < dataUp.length / 2; i++)
+                                dataUp[2 * i + 1] = 0X07;   // 关闭喊话
+//                            onDataFromMSDKToOSDK( dataUp );
+                            mItemTexts[5] = "@string/shout_off";
+                            bShout = false;
+                        }
+                        break;
+                    case 7:
+                        Toast.makeText( CompleteWidgetActivity.this, "@string/reserved", Toast.LENGTH_SHORT ).show();
+//                        // 1-无操作，2-照明，3-发射，4-闪光，5-喊话，6-发射，7-激光。
+//                        for (int i = 0; i < dataUp.length / 2; i++)
+//                            dataUp[2 * i + 1] = 0X06;   // 激光
+//                        onDataFromMSDKToOSDK(dataUp);
+                        break;
+                    default:
+                        break;
+                }
+                initCircleMenuUI( mCircleMenuLayout );
             }
 
             @Override
             public void itemCenterClick(View view)
             {
-                Toast.makeText(CompleteWidgetActivity.this,
-                        "you can do something just like ccb  ",
-                        Toast.LENGTH_SHORT).show();
-           }
+                onFireClick();
+            }
         });
 //        原文：https://blog.csdn.net/lmj623565791/article/details/43131133
 
-        initMainUI();   // 为初始化刷新挂架状态的函数。
-        initTabLayoutView();   // 导航栏初始化。
-        initMap();
-        mapView.onCreate( savedInstanceState );
-        updateImage(dataDown);    // 初始化和更新挂架状态的显示。2018.10.04
-//        onDataFromOnboardToMSDK();   // 设置接收下行数据的函数。
-        addListener();    // 对添加航线飞行目标点的监视。    2019.2.9
     }
-
-    private void initMap(){
-
-        if (aMap == null) {
-            aMap = mapView.getMap();
-            aMap.setOnMapClickListener( new AMap.OnMapClickListener() {
-                @Override
-                public void onMapClick(LatLng latLng) {
-                    onViewClick( mapView );// 添加航迹规划的函数。2019.1.19
-                    if (isAdd == true) {
-                        markWaypoint( latLng );   // 可以添加目标点。   2019.02.08
-                        Waypoint mWaypoint = new Waypoint( latLng.latitude, latLng.longitude, altitude );
-                        Toast.makeText(CompleteWidgetActivity.this,
-                                "经度：" +String.valueOf(latLng.latitude)+
-                                        "，纬度：" +String.valueOf(latLng.longitude)+
-                                        "，高度：" +String.valueOf(altitude), Toast.LENGTH_SHORT).show();
-                        //Add Waypoints to Waypoint arraylist;
-                        if (waypointMissionBuilder != null) {
-                            waypointList.add( mWaypoint );
-                            waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
-                        } else {
-                            waypointMissionBuilder = new WaypointMission.Builder();
-                            waypointList.add( mWaypoint );
-                            waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
-                        }
-                    }
-                    else{
-                        Toast.makeText(CompleteWidgetActivity.this,"请点击添加后添加目标点。",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }
-            } );// add the listener for click for amap object
-        }
-
-        LatLng hefei = new LatLng(31.83, 117.25);
-        aMap.addMarker(new MarkerOptions().position(hefei).title("Marker in HeFei"));
-//        aMap.moveCamera( CameraUpdateFactory.newLatLng(hefei));
-    }
-
     private void initMainUI(){
         // 将挂架存储为数组形式，方便在循环中调用。  2018.10.17
         cb[0] = (CheckBox) findViewById( R.id.checkbox1 );
@@ -267,13 +382,15 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 R.drawable.selector_pylon5,//bomb_tear,
                 R.drawable.selector_pylon6,//bomb_tear_ready,
                 R.drawable.selector_pylon7,//bomb_stun,
-                R.drawable.selector_pylon8  //bomb_stun_ready,
+                R.drawable.selector_pylon8,  //bomb_stun_ready,
+                R.drawable.selector_pylon9,//bomb_stun,
+                R.drawable.selector_pylon10  //bomb_stun_ready,
         };
         // 弹的种类：无弹、烟雾弹、催泪弹、震爆弹，依次用0000，0001，0010，0011表示。
         // 弹的状态：盖关0000、盖开0001。
         dataDown = new byte[]{
-                0X00,0X10,    // 第一字节表示1号挂架，第二字节无弹盖关
-                0X01,0X11,    // 第一字节表示2号挂架，第二字节无弹盖开
+                0X00,0X00,    // 第一字节表示1号挂架，第二字节无弹盖关
+                0X01,0X01,    // 第一字节表示2号挂架，第二字节无弹盖开
                 0X02,0X10,    // 第一字节表示3号挂架，第二字节烟雾弹盖关
                 0X03,0X11,    // 第一字节表示4号挂架，第二字节烟雾弹盖开
                 0X04,0X20,    // 第一字节表示5号挂架，第二字节催泪弹盖关
@@ -281,6 +398,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 0X06,0X30,    // 第一字节表示7号挂架，第二字节震爆弹盖关
                 0X07,0X31     // 第一字节表示8号挂架，第二字节震爆弹盖开
         };
+        dataDownOld = new byte[]{0X00,0X00,0X01,0X00,0X02,0X00,0X03,0X00,0X04,0X00,0X05,0X00,0X06,0X00,0X07,0X00};
         // 操作命令：无操作0X00、发射准备0X01、发射0X02、取消发射0X03、返回挂架状态0X04。。
         dataUp = new byte[]{
                 0X00,0X00,    // 第一字节表示1号挂架，第二字节无操作
@@ -294,239 +412,321 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         };
     }
 
+//    private void initMap(){
+//
+//        if (aMap == null) {
+//            aMap = mapWidget.getMap();
+//            aMap.setOnMapClickListener( new DJIMap.OnMapClickListener(){
+//                @Override
+//                public void onMapClick(DJILatLng latLng) {
+////                    onViewClick( mapWidget );// 添加航迹规划的函数。2019.1.19
+//                    if (isAdd) {
+//                        markWaypoint( latLng );   // 可以添加目标点。   2019.02.08
+//                        Waypoint mWaypoint = new Waypoint( latLng.latitude, latLng.longitude, altitude );
+////                        Toast.makeText(CompleteWidgetActivity.this,
+////                                "经度：" +String.valueOf(latLng.latitude)+
+////                                        "，纬度：" +String.valueOf(latLng.longitude)+
+////                                        "，高度：" +String.valueOf(altitude), Toast.LENGTH_SHORT).show();
+//                        //Add Waypoints to Waypoint arraylist;
+//                        if (waypointMissionBuilder != null) {
+//                            waypointList.add( mWaypoint );
+//                            waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
+//                        } else {
+//                            waypointMissionBuilder = new WaypointMission.Builder();
+//                            waypointList.add( mWaypoint );
+//                            waypointMissionBuilder.waypointList( waypointList ).waypointCount( waypointList.size() );
+//                        }
+//                        Log.d( TAG_COM,"地图目标数量：" +String.valueOf( waypointList.size() ) );
+//                    }
+////                    else{
+////                        Toast.makeText(CompleteWidgetActivity.this,"请点击添加后添加目标点。",
+////                                Toast.LENGTH_SHORT).show();
+////                    }
+//                }
+//            } );// add the listener for click for amap object
+//        }
+//
+////        LatLng hefei = new LatLng(31.83, 117.25);
+////        aMap.addMarker(new MarkerOptions().position(hefei).title("Marker in HeFei"));
+//        initFlightController();
+////        updateDroneLocation();
+////        aMap.moveCamera( CameraUpdateFactory.newLatLng(hefei));
+//    }
+
+//    private void initFlightController() {
+//
+//        BaseProduct product = GetProductApplication.getProductInstance();
+//        if (product != null && product.isConnected()) {
+//            if (product instanceof Aircraft) {
+//                mFlightController = ((Aircraft) product).getFlightController();
+//            }
+//        }
+//
+//        if (mFlightController != null) {
+//
+//            mFlightController.setStateCallback(
+//                    new FlightControllerState.Callback() {
+//                        @Override
+//                        public void onUpdate(FlightControllerState
+//                                                     djiFlightControllerCurrentState) {
+//                            droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
+//                            droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
+//                            updateDroneLocation();
+//                        }
+//                    });
+//
+//        }
+//    }
+
     // 初始化和更新挂架状态的显示。2018.10.04
     public void updateImage(byte[] data) {
         int bomb_type = 0;
+        int tmp = 0X00;
         for (int i = 0; i < data.length/2; i ++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，
         {
-            switch (data[2*i+1])    // 第二位是状态。与imagePath对应。
-            {
-                case 0X00:  bomb_type = 0;  break;  // bomb_empty
-                case 0X01:  bomb_type = 1;  break;  // bomb_empty_open
-                case 0X10:  bomb_type = 2;  break;  // bomb_smoking
-                case 0X11:  bomb_type = 3;  break;  // bomb_smoking_ready
-                case 0X20:  bomb_type = 4;  break;  // bomb_tear
-                case 0X21:  bomb_type = 5;  break;  // bomb_tear_ready
-                case 0X30:  bomb_type = 6;  break;  // bomb_stun
-                case 0X31:  bomb_type = 7;  break;  // bomb_stun_ready
-                default:
-                    Toast.makeText( CompleteWidgetActivity.this,
-                            "返回机载状态错误！", Toast.LENGTH_SHORT ).show();
-            }
+            tmp = data[2*i+1];
+            if(tmp == 0X00)  bomb_type = 0;
+            else if(tmp >= 0X01 && tmp <= 0X07) bomb_type = 1;
+            else if(tmp == 0X10)  bomb_type = 2;
+            else if(tmp >= 0X11 && tmp <= 0X17) bomb_type = 3;
+            else if(tmp == 0X20)  bomb_type = 4;
+            else if(tmp >= 0X21 && tmp <= 0X27) bomb_type = 5;
+            else if(tmp == 0X30)  bomb_type = 6;
+            else if(tmp >= 0X31 && tmp <= 0X37) bomb_type = 7;
+            else if(tmp == 0X40)  bomb_type = 8;
+            else if(tmp >= 0X41 && tmp <= 0X47) bomb_type = 9;
+            else
+                  Toast.makeText( CompleteWidgetActivity.this,
+                            "Pylons Status Error！", Toast.LENGTH_SHORT ).show();
+
+//            switch (data[2*i+1])    // 第二位是状态。与imagePath对应。
+//            {
+//                case 0X00:  bomb_type = 0;  break;  // bomb_empty
+//                case 0X01:  bomb_type = 1;  break;  // bomb_empty_open
+//                case 0X10:  bomb_type = 2;  break;  // bomb_smoking
+//                case 0X11:  bomb_type = 3;  break;  // bomb_smoking_ready
+//                case 0X20:  bomb_type = 4;  break;  // bomb_tear
+//                case 0X21:  bomb_type = 5;  break;  // bomb_tear_ready
+//                case 0X30:  bomb_type = 6;  break;  // bomb_stun
+//                case 0X31:  bomb_type = 7;  break;  // bomb_stun_ready
+//                default:
+//                    Toast.makeText( CompleteWidgetActivity.this,
+//                            "返回机载状态错误！", Toast.LENGTH_SHORT ).show();
+//            }
             cb[i].setButtonDrawable( imagePath[bomb_type] );
 //            cb[i].setButtonDrawable(getResources().getDrawable(imagePath[bomb_type]) );
         }
 
     }
-    private void initTabLayoutView() {
-        tabLayout = (TabLayout) findViewById(R.id.tablayout);
-        vp_pager = (ViewPager)findViewById(R.id.tab_viewpager);
-        fragments = new ArrayList<>();
-        fragments.add(new Fragment1());
-        fragments.add(new Fragment2());
-        fragments.add(new Fragment3());
-        fragments.add(new Fragment4());
-//        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" ).setIcon( getDrawable( R.drawable.alert_icon ) );
-        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" );
-        TabLayout.Tab tab2 = tabLayout.newTab().setText( "发射操作" );
-        TabLayout.Tab tab3 = tabLayout.newTab().setText( "航线飞行" );
-        TabLayout.Tab tab4 = tabLayout.newTab().setText( "更多功能" );
-        tabLayout.addTab( tab1 );
-        tabLayout.addTab( tab2 );
-        tabLayout.addTab( tab3 );
-        tabLayout.addTab( tab4 );
-
-        titles = new String[]{"弹仓状态","发射操作","航线飞行","更多功能"};
-        MyAdapter adapter = new MyAdapter(getSupportFragmentManager(),fragments,titles);
-        vp_pager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(vp_pager);   //关联TabLayout和ViewPager
-        // 添加竖直分割线
-        LinearLayout linearLayout = (LinearLayout) tabLayout.getChildAt(0);
-        linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-        linearLayout.setDividerDrawable( ContextCompat.getDrawable(this,
-                R.drawable.divide_vitercle));
-    }
+//    private void initTabLayoutView() {
+//        tabLayout = (TabLayout) findViewById(R.id.tablayout);
+//        vp_pager = (ViewPager)findViewById(R.id.tab_viewpager);
+//        fragments = new ArrayList<>();
+//        fragments.add(new Fragment1());
+//        fragments.add(new Fragment2());
+//        fragments.add(new Fragment3());
+//        fragments.add(new Fragment4());
+////        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" ).setIcon( getDrawable( R.drawable.alert_icon ) );
+//        TabLayout.Tab tab1 = tabLayout.newTab().setText( "弹仓状态" );
+//        TabLayout.Tab tab2 = tabLayout.newTab().setText( "发射操作" );
+//        TabLayout.Tab tab3 = tabLayout.newTab().setText( "航线飞行" );
+//        TabLayout.Tab tab4 = tabLayout.newTab().setText( "更多功能" );
+//        tabLayout.addTab( tab1 );
+//        tabLayout.addTab( tab2 );
+//        tabLayout.addTab( tab3 );
+//        tabLayout.addTab( tab4 );
 //
-    public class MyAdapter extends FragmentPagerAdapter {
-        private List<Fragment> fragments;
-        private String[] tabNames;//tab选项名字
+//        titles = new String[]{"弹仓状态","发射操作","航线飞行","更多功能"};
+//        MyAdapter adapter = new MyAdapter(getSupportFragmentManager(),fragments,titles);
+//        vp_pager.setAdapter(adapter);
+//        tabLayout.setupWithViewPager(vp_pager);   //关联TabLayout和ViewPager
+//        // 添加竖直分割线
+//        LinearLayout linearLayout = (LinearLayout) tabLayout.getChildAt(0);
+//        linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+//        linearLayout.setDividerDrawable( ContextCompat.getDrawable(this,
+//                R.drawable.divide_vitercle));
+//    }
+////
+//    public class MyAdapter extends FragmentPagerAdapter {
+//        private List<Fragment> fragments;
+//        private String[] tabNames;//tab选项名字
+//
+//
+//        public MyAdapter(FragmentManager fm,List<Fragment> fragments,String[] tabNames) {
+//            super(fm);
+//            this.fragments = fragments;
+//            this.tabNames = tabNames;
+//        }
+//
+//        @Override
+//        public Fragment getItem(int position) {
+//            return fragments.get(position);  //返回碎片集合的第几项
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return fragments.size();    //返回碎片集合大小
+//        }
+//
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            return tabNames[position];    //返回标题的第几项
+//        }
+//    }
 
-
-        public MyAdapter(FragmentManager fm,List<Fragment> fragments,String[] tabNames) {
-            super(fm);
-            this.fragments = fragments;
-            this.tabNames = tabNames;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return fragments.get(position);  //返回碎片集合的第几项
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();    //返回碎片集合大小
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return tabNames[position];    //返回标题的第几项
-        }
-    }
-
-    @Override
-    public void sendMessage(int btnId) {
-        //...写上你想执行的代码
-        switch (btnId) {
-            case R.id.btnDispStatus:
-                vStatus.setVisibility( View.VISIBLE );
-//                Toast.makeText( getApplicationContext(), "显示弹仓状态", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnHideStatus:
-                vStatus.setVisibility( View.GONE );
-//                Toast.makeText( getApplicationContext(), "隐藏弹仓状态", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnSimpleMode:
-                Toast.makeText( getApplicationContext(), "敬请关注……", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnFireAllMode:
-                onFireClick();
-//                Toast.makeText( getApplicationContext(), "发射", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnTrim:
-                onFireClick();
-//                Toast.makeText( getApplicationContext(), "微调", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnAddMarks:
-                isAdd = true;
-//                Toast.makeText( getApplicationContext(), "添加航点", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnUpload:
-                isAdd = false;
-                uploadWayPointMission();
-//                Toast.makeText( getApplicationContext(), "上传航点", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnClearMarks:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        aMap.clear();
-                    }
-                });
-                waypointList.clear();
-                waypointMissionBuilder.waypointList(waypointList);
-                updateDroneLocation();
-                Toast.makeText(CompleteWidgetActivity.this,"清除目标点成功",Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.btnStart:
-                startWaypointMission();
-//                Toast.makeText( getApplicationContext(), "开始航线飞行", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnStop:
-                stopWaypointMission();
-//                Toast.makeText( getApplicationContext(), "停止航线飞行", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnSettings:
-                showSettingDialog();
-//                Toast.makeText( getApplicationContext(), "航线飞行设置", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnDownActive:
-                onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
-//                SystemClock.sleep(1000);  // 等待下行数据。
-                for(int i=0;i<dataUp.length/2;i++)
-                    dataUp[2*i+1] = 0X05;
-                onDataFromMSDKToOSDK( dataUp );
-                showProgressDialog();
-//                Toast.makeText( getApplicationContext(), "激活下行链路", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnDownCheck:
-                onPylonsStatusClick();
-//                Toast.makeText( getApplicationContext(), "检查下行链路", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnBrowseLog:
-                Toast.makeText( getApplicationContext(), "查看日志", Toast.LENGTH_SHORT ).show();
-                break;
-            case R.id.btnExportLog:
-                Toast.makeText( getApplicationContext(), "导出日志", Toast.LENGTH_SHORT ).show();
-                break;
-            default:
-                break;
-        }
-    }
+//    @Override
+//    public void sendMessage(int btnId) {
+//        //...写上你想执行的代码
+//        switch (btnId) {
+//            case R.id.btnDispStatus:
+//                vStatus.setVisibility( View.VISIBLE );
+////                Toast.makeText( getApplicationContext(), "显示弹仓状态", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnHideStatus:
+//                vStatus.setVisibility( View.GONE );
+////                Toast.makeText( getApplicationContext(), "隐藏弹仓状态", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnSimpleMode:
+//                Toast.makeText( getApplicationContext(), "敬请关注……", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnFireAllMode:
+//                onFireClick();
+////                Toast.makeText( getApplicationContext(), "发射", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnTrim:
+//                onFireClick();
+////                Toast.makeText( getApplicationContext(), "微调", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnAddMarks:
+//                isAdd = true;
+////                Toast.makeText( getApplicationContext(), "添加航点", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnUpload:
+//                isAdd = false;
+//                uploadWayPointMission();
+////                Toast.makeText( getApplicationContext(), "上传航点", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnClearMarks:
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        aMap.clear();
+//                    }
+//                });
+//                waypointList.clear();
+//                waypointMissionBuilder.waypointList(waypointList);
+//                updateDroneLocation();
+//                Toast.makeText(CompleteWidgetActivity.this,"清除目标点成功",Toast.LENGTH_SHORT).show();
+//                break;
+//            case R.id.btnStart:
+//                startWaypointMission();
+////                Toast.makeText( getApplicationContext(), "开始航线飞行", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnStop:
+//                stopWaypointMission();
+////                Toast.makeText( getApplicationContext(), "停止航线飞行", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnSettings:
+//                showSettingDialog();
+////                Toast.makeText( getApplicationContext(), "航线飞行设置", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnDownActive:
+//                onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
+////                SystemClock.sleep(1000);  // 等待下行数据。
+//                for(int i=0;i<dataUp.length/2;i++)
+//                    dataUp[2*i+1] = 0X05;
+//                onDataFromMSDKToOSDK( dataUp );
+//                showProgressDialog();
+////                Toast.makeText( getApplicationContext(), "激活下行链路", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnDownCheck:
+//                onPylonsStatusClick();
+////                Toast.makeText( getApplicationContext(), "检查下行链路", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnBrowseLog:
+//                Toast.makeText( getApplicationContext(), "查看日志", Toast.LENGTH_SHORT ).show();
+//                break;
+//            case R.id.btnExportLog:
+//                Toast.makeText( getApplicationContext(), "导出日志", Toast.LENGTH_SHORT ).show();
+//                break;
+//            default:
+//                break;
+//        }
+//    }
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
         switch (compoundButton.getId()) {
             case R.id.checkbox1:
-                if (dataDown[1] ==0X00||dataDown[1] ==0X01)   // 奇数位表示挂架号，偶数位表示状态。
-                {
-                    showHintsDialog();
-                    cb[0].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[1] ==0X00||dataDown[1] ==0X01)   // 奇数位表示挂架号，偶数位表示状态。
+//                {
+//                    showHintsDialog();
+//                    cb[0].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[0] = isChecked;
                 break;
             case R.id.checkbox2:
-                if (dataDown[3] ==0X00||dataDown[3] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[1].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[3] ==0X00||dataDown[3] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[1].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[1] = isChecked;
                 break;
             case R.id.checkbox3:
-                if (dataDown[5] ==0X00||dataDown[5] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[2].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[5] ==0X00||dataDown[5] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[2].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[2] = isChecked;
                 break;
             case R.id.checkbox4:
-                if (dataDown[7] ==0X00||dataDown[7] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[3].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[7] ==0X00||dataDown[7] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[3].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[3] = isChecked;
                 break;
             case R.id.checkbox5:
-                if (dataDown[9] ==0X00||dataDown[9] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[4].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[9] ==0X00||dataDown[9] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[4].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[4] = isChecked;
                 break;
             case R.id.checkbox6:
-                if (dataDown[11] ==0X00||dataDown[11] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[5].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[11] ==0X00||dataDown[11] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[5].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[5] = isChecked;
                 break;
             case R.id.checkbox7:
-                if (dataDown[13] ==0X00||dataDown[13] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[6].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[13] ==0X00||dataDown[13] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[6].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[6] = isChecked;
                 break;
             case R.id.checkbox8:
-                if (dataDown[15] ==0X00||dataDown[15] ==0X01)
-                {
-                    showHintsDialog();
-                    cb[7].setChecked( false );
-                    isChecked = false;
-                }
+//                if (dataDown[15] ==0X00||dataDown[15] ==0X01)
+//                {
+//                    showHintsDialog();
+//                    cb[7].setChecked( false );
+//                    isChecked = false;
+//                }
                 cbChecked[7] = isChecked;
                 break;
             default:
@@ -553,34 +753,107 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 // 接收部分。  是否需要的一个线程专门负责接收飞机状态？2018.10.04
 //    在OnCreate中引用该是函数，是否会一直对接收数据进行监听？
     private void onDataFromOnboardToMSDK( ){
-        FlightController mFlightController = GetProductApplication.getFlightControllerInstance();
+//        mFlightController = GetProductApplication.getFlightControllerInstance();
         if(mFlightController==null)
             Toast.makeText(CompleteWidgetActivity.this,
-                    "无法连接到飞机，请确认安装正确并重启软件。",Toast.LENGTH_SHORT).show();
+                    "Can not connect the drone. Please try again.",Toast.LENGTH_SHORT).show();
         else
             mFlightController.setOnboardSDKDeviceDataCallback(new FlightController.OnboardSDKDeviceDataCallback() {
                 @Override
                 public void onReceive(byte[] data) {
-                    // 1、更新挂架状态；2、提示正在执行的操作。
-    //                UpdateHints(dataDown,data);
+                    // 1、如果状态有变，更新挂架状态；2、发出提示音，并显示弹仓；3、当前状态为老状态。
+                    //                UpdateHints(dataDown,data);
                     System.arraycopy(data, 0, dataDown, 0, PYLON_NUM*2);  // 下行状态数据拷贝到dataDown。
-                    updateImage(dataDown);  // 作为测试，这两行可以暂时不要。2018.11.14
+                    if(!dataCmp( dataDown,dataDownOld,PYLON_NUM*2 )) {   // 表示状态改变
+                        updateImage( dataDown );  // 作为测试，这两行可以暂时不要。2018.11.14
+                        playSound( );
+                        findViewById( R.id.status).setVisibility( View.VISIBLE );
+                        System.arraycopy( data,0,dataDownOld,0,PYLON_NUM*2 );
+                    }
                 }
             });
+
     }
-    
+
+    // 比较两个数组的异同，相同返回true，不同返回false。
+    private boolean dataCmp(byte [] data1,byte [] data2,int length){
+        boolean bValue = true;
+        for(int k = 0;k < length; k++){
+            if(data1[k] != data2[k]){
+                bValue = false;
+                break;
+            }
+        }
+        return bValue;
+    }
+
+    // 播放提示音
+    public void playSound( ) {
+        Uri uri = RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION) ;
+        Ringtone mRingtone = RingtoneManager.getRingtone(CompleteWidgetActivity.this,uri);
+        mRingtone.play();
+
+//        new Thread(new Runnable() {
+//            // The wrapper thread is unnecessary, unless it blocks on the
+//            // Clip finishing; see comments.
+//            public void run() {
+//                try {
+//                    AssetFileDescriptor fileDescriptor = assetManager.openFd("CongratulationsAmazing.mp3");
+//                    player.setDataSource(fileDescriptor.getFileDescriptor(), fileDescriptor.getStartOffset(), fileDescriptor.getStartOffset());
+//                    player.prepare();
+//                    player.start();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
+    }
+
     private void onViewClick(View view) {
-//        Class nextActivityClass = null;
-        if (view == fpvWidget && !isMapMini) {// 视频窗小的时候，将其放大。（隐藏航迹规划按钮）
-            resizeFPVWidget( RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT, 0, 0 );
-            ResizeAnimation mapViewAnimation = new ResizeAnimation( mapView, deviceWidth, deviceHeight, width, height, margin );
-            mapView.startAnimation( mapViewAnimation );
-            isMapMini = true;
-        } else if (view == mapView && isMapMini) {// 地图窗小的时候，将其放大。（显示航迹规划按钮）
-            resizeFPVWidget( width, height, margin, 2 );
-            ResizeAnimation mapViewAnimation = new ResizeAnimation( mapView, width, height, deviceWidth, deviceHeight, 0 );
-            mapView.startAnimation( mapViewAnimation );
+//        if (view == fpvWidget && !isMapMini) {  //　视窗放大，地图缩小
+//            resizeFPVWidget(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT, 0, 0);
+////            RelativeLayout.LayoutParams fpvParams = (RelativeLayout.LayoutParams) fpvWidget.getLayoutParams();
+////            ResizeAnimation fpvWidgetAnimation = new ResizeAnimation(fpvWidget, width, height, deviceWidth, deviceHeight, margin);
+////            fpvWidget.startAnimation(fpvWidgetAnimation);
+//            ResizeAnimation mapViewAnimation = new ResizeAnimation(mapWidget, deviceWidth, deviceHeight, width, height, margin);
+//            mapWidget.startAnimation(mapViewAnimation);
+//            isMapMini = true;
+//        } else if (view == mapWidget && isMapMini) {  // 地图放大，视窗缩小。
+//            resizeFPVWidget(width, height, 0, 2);
+////            RelativeLayout.LayoutParams fpvParams = (RelativeLayout.LayoutParams) fpvWidget.getLayoutParams();
+////            ResizeAnimation fpvWidgetAnimation = new ResizeAnimation(fpvWidget, deviceWidth, deviceHeight, width, height, margin);
+////            fpvWidget.startAnimation(fpvWidgetAnimation);
+//            ResizeAnimation mapViewAnimation = new ResizeAnimation(mapWidget, width, height, deviceWidth, deviceHeight, 0);
+//            mapWidget.startAnimation(mapViewAnimation);
+//            isMapMini = false;
+//            updateDroneLocation();   // 定位飞机 2019.07.20
+////            onRouteFlightClick();
+//        }
+    }
+    private void exchangeView(boolean isMapMiniLocal) {
+        if (isMapMiniLocal) {  //　地图放大，视窗缩小。
+            ResizeAnimation mapViewAnimation = new ResizeAnimation(mapWidget, width, height, deviceWidth, deviceHeight, 0);
+            resizeFPVWidget(width, height, 0, 2);
+//            RelativeLayout.LayoutParams fpvParams = (RelativeLayout.LayoutParams) fpvWidget.getLayoutParams();
+//            ResizeAnimation fpvWidgetAnimation = new ResizeAnimation(fpvWidget, deviceWidth, deviceHeight, width, height, margin);
+//            fpvWidget.startAnimation(fpvWidgetAnimation);
+            mapWidget.startAnimation(mapViewAnimation);
             isMapMini = false;
+//            Log.d( TAG_COM,"地图目标宽度：" +String.valueOf( deviceWidth ) );
+//            Toast.makeText( CompleteWidgetActivity.this,"放大地图",Toast.LENGTH_LONG ).show();
+//            updateDroneLocation();   // 定位飞机 2019.07.20
+//            getDroneLocation(mFlightController);
+//            onRouteFlightClick();
+        } else {  // 视窗放大，地图缩小
+            ResizeAnimation mapViewAnimation = new ResizeAnimation(mapWidget, deviceWidth, deviceHeight, width, height, margin);
+            resizeFPVWidget(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT, 0, 0);
+//            RelativeLayout.LayoutParams fpvParams = (RelativeLayout.LayoutParams) fpvWidget.getLayoutParams();
+//            ResizeAnimation fpvWidgetAnimation = new ResizeAnimation(fpvWidget, width, height, deviceWidth, deviceHeight, margin);
+//            fpvWidget.startAnimation(fpvWidgetAnimation);
+            mapWidget.startAnimation(mapViewAnimation);
+            isMapMini = true;
+            Toast.makeText( getApplicationContext(),"Zoom out",Toast.LENGTH_LONG ).show();
+//            Log.d( TAG_COM,"地图目标宽度：" +String.valueOf( width ) );
         }
     }
 
@@ -590,10 +863,12 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         fpvParams.width = width;
         fpvParams.rightMargin = margin;
         fpvParams.bottomMargin = margin;
+//        fpvParams.alignWithParent = true;
         fpvWidget.setLayoutParams( fpvParams );
 
         parentView.removeView( fpvWidget );
         parentView.addView( fpvWidget, fpvInsertPosition );
+//        Toast.makeText( getApplicationContext(),"resizeFPVWidget 已执行",Toast.LENGTH_SHORT).show();
     }
 
     // 检查载荷状态 2018.08.17
@@ -650,7 +925,7 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
             @Override
             public void onClick (DialogInterface dialog,int which)
             {
-                // 1-无操作，2-发射准备，3-发射，4-取消发射，5-返回挂架状态，6-调整盖板
+                // 1-无操作，2-照明，3-发射，4-闪光，5-喊话，6-发射，7-激光。
                 setDataUp(cbChecked,3);    // public void setDataUp(boolean [] cbChecked,int flag)
                 onDataFromMSDKToOSDK(dataUp);
 //                FireButton.setBackgroundColor( getColor( R.color.red ) );
@@ -660,17 +935,17 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                 }
             }
         });
-        builder.setNeutralButton("调整盖板",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick (DialogInterface dialog, int which)
-            {
-                setDataUp(cbChecked,6);    // public void setDataUp(boolean [] cbChecked,int flag)
-                onDataFromMSDKToOSDK(dataUp);
-                for(int i=0;i<cbChecked.length;i++) {
-                    cb[i].setChecked( false );
-                }
-            }
-        });
+//        builder.setNeutralButton("调整盖板",new DialogInterface.OnClickListener(){
+//            @Override
+//            public void onClick (DialogInterface dialog, int which)
+//            {
+//                setDataUp(cbChecked,6);    // public void setDataUp(boolean [] cbChecked,int flag)
+//                onDataFromMSDKToOSDK(dataUp);
+//                for(int i=0;i<cbChecked.length;i++) {
+//                    cb[i].setChecked( false );
+//                }
+//            }
+//        });
         builder.setNegativeButton("取消",new DialogInterface.OnClickListener(){
             @Override
             public void onClick (DialogInterface dialog, int which)
@@ -684,13 +959,40 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     }
 
     private String bombStatusDisp(byte []data,int k) {
-    String bomb_status = "";
-    byte[] status = new byte[PYLON_NUM];
-    for (int i = 0; i < status.length; i++)
-        status[i] = data[2 * i + 1];   // 只取状态位
+//        int tmp = 0X00;
+//        for (int i = 0; i < data.length/2; i ++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，
+//        {
+//            tmp = data[2 * i + 1];
+//            if (tmp == 0X00) bomb_type = 0;
+//            else if (tmp >= 0X01 && tmp <= 0X07) bomb_type = 1;
+//            else if (tmp == 0X10) bomb_type = 2;
+//            else if (tmp >= 0X11 && tmp <= 0X17) bomb_type = 3;
+//            else if (tmp == 0X20) bomb_type = 4;
+//            else if (tmp >= 0X21 && tmp <= 0X27) bomb_type = 5;
+//            else if (tmp == 0X30) bomb_type = 6;
+//            else if (tmp >= 0X31 && tmp <= 0X37) bomb_type = 7;
+//            else if (tmp == 0X40) bomb_type = 8;
+//            else if (tmp >= 0X41 && tmp <= 0X47) bomb_type = 9;
+//            else
+//                Toast.makeText( CompleteWidgetActivity.this,
+//                        "返回机载状态错误！", Toast.LENGTH_SHORT ).show();
+//        }
+        String bomb_status = "";
+        byte[] status = new byte[PYLON_NUM];
+        for (int i = 0; i < status.length; i++)
+            status[i] = data[2 * i + 1];   // 只取状态位
 
-        for (int i = 0; i < status.length; i++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，status只截取了其状态位。
-        switch (status[i])    // 第二位是状态。。
+//        for (int i = 0; i < status.length; i++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，status只截取了其状态位。
+//        switch (status[i]>>4)    // 第二位是状态。。
+//        {
+//            case 0X00:                bomb_status = "无  弹  ";                break;  // bomb_empty
+//            case 0X01:                bomb_status = "烟雾弹  ";                break;  // bomb_smoking
+//            case 0X02:                bomb_status = "催泪弹  ";                break;  // bomb_tear
+//            case 0X03:                bomb_status = "震爆弹  ";                break;  // bomb_stun
+//            case 0X04:                bomb_status = "闪光弹  ";                break;  // bomb_stun
+//            default:                  bomb_status = "";
+//        }
+        switch (status[k-1])    // 第二位是状态。。
         {
             case 0X00:                bomb_status = "无  弹  ";                break;  // bomb_empty
             case 0X01:                bomb_status = "无  弹  ";                break;  // bomb_empty_open
@@ -700,82 +1002,17 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
             case 0X21:                bomb_status = "催泪弹  ";                break;  // bomb_tear_ready
             case 0X30:                bomb_status = "震爆弹  ";                break;  // bomb_stun
             case 0X31:                bomb_status = "震爆弹  ";                break;  // bomb_stun_ready
+            case 0X40:                bomb_status = "闪光弹  ";                break;  // bomb_stun
+            case 0X41:                bomb_status = "闪光弹  ";                break;  // bomb_stun_ready
             default:                  bomb_status = "";
         }
 
     return bomb_status;
 }
 
-// 此按钮功能已取消。函数功能已由onFireClick来完成。2019.1.17
-    private void OnFireClick()
-    {
- /*       AlertDialog.Builder builder = new AlertDialog.Builder( CompleteWidgetActivity.this,R.style.CustomDialogStyle );
-        builder.setIcon(R.drawable.alert_icon);
-        builder.setTitle("即将执行发射操作，请确认！");
-        // 只需要在界面上显示弹的状态就可以了。也就是对弹状态的监控。  2018.11.03
-        final String[] hobbies = {"1号挂架", "2号挂架", "3号挂架", "4号挂架",
-                "5号挂架", "6号挂架", "7号挂架", "8号挂架", };
-        nTemp.clear();
-        sTemp.clear();
-        for(int i=0;i<cbChecked.length;i++)
-        {
-            if(cbChecked[i])
-            {
-                nTemp.add( i);            // 把选中的架号存储下来
-                sTemp.add(hobbies[i] );      // 挂架号字符。
-            }
-        }
-        String[] s1 = new String[sTemp.size()];   //
-        builder.setMultiChoiceItems(sTemp.toArray(s1),null,new DialogInterface.OnMultiChoiceClickListener(){
-            @Override
-            public void onClick (DialogInterface dialog,int which, boolean isChecked)
-            {
-                if (isChecked) {  // 在这里需要让选中的挂架sTemp，对应到hobbies上，即在操作时，知道对哪个挂架操作。2018.10.30
-                    Toast.makeText( CompleteWidgetActivity.this, nTemp.get(which)+1+" 号即将发射",
-                            Toast.LENGTH_SHORT ).show();
-                }
-                else{  // 找到该选项的字符串“*号弹”的起始位置，删除该字符串。2018.07.19
-                    Toast.makeText( CompleteWidgetActivity.this, nTemp.get(which)+1+" 号取消发射",
-                            Toast.LENGTH_SHORT ).show();
-                }
-                cbChecked[nTemp.get(which)] = isChecked;
-                cb[nTemp.get(which)].setChecked( isChecked);
-            }
-        });
-        // 在这里重载确定按钮的函数。目前是按软件发送指令的思路在做。
-//        完成工作：1、生成上传指令；2、上传指令；3、更新主界面中挂架的状态；4、关闭发射按钮。
-        builder.setPositiveButton("确定",new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick (DialogInterface dialog,int which)
-            {
-                setDataUp(cbChecked,3);    // public void setDataUp(boolean [] cbChecked,int flag)
-                onDataFromMSDKToOSDK(dataUp);
-                FireButton.setBackgroundColor( getColor( R.color.gray_light ) );
-                FireButton.setEnabled( false );    // 关闭<发射>按钮。
-                for(int i=0;i<cb.length;i++) {
-                    cbChecked[i] = false;
-                    cb[i].setChecked( false );  // 为每一个复选框设置一个监听函数。
-                }
-
-            }
-        });
-        builder.setNegativeButton("取消",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick (DialogInterface dialog, int which)
-            { }
-        });
-
-//        DataFromMSDKToOSDK(dataUp);
-        final AlertDialog dialog =builder.create();
-        dialog.show();
-        //此处设置位置窗体大小
-        dialog.getWindow().setLayout(DensityUtil.dip2px(CompleteWidgetActivity.this,300),
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-*/    }
-
     // 指令上传 2018.08.17
     private void onDataFromMSDKToOSDK(byte []data){
-        FlightController mFlightController = GetProductApplication.getFlightControllerInstance();
+//        mFlightController = GetProductApplication.getFlightControllerInstance();
         if(mFlightController.isOnboardSDKDeviceAvailable()){
             mFlightController.sendDataToOnboardSDKDevice(data, new CommonCallbacks.CompletionCallback() {
                 @Override
@@ -783,38 +1020,27 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                     if(djiError!=null) {
                         Toast.makeText(getApplicationContext(),djiError.toString(),Toast.LENGTH_SHORT).show();  //发送指令失败！
                     }else{
-                        Toast.makeText(getApplicationContext(),"发送成功",Toast.LENGTH_SHORT).show();  //发送指令失败！
+                        Toast.makeText(getApplicationContext(),"Send sucessfully.",Toast.LENGTH_SHORT).show();  //发送指令失败！
                     }
                 }
             });
         }
     }
     // 根据选中的挂架和操作要求，设置上行指令。
-    // 1-无操作，2-发射准备，3-发射，4-取消发射，5-返回挂架状态，6-调整盖板
+    // 1-无操作，2-照明，3-发射，4-闪光，5-喊话，6-发射，7-激光。
     private void setDataUp(boolean [] cbChecked,int flag)
     {
         for(int i=0;i<cbChecked.length;i++)
         {
             if(cbChecked[i]) {
                 switch (flag) {
-                    case 1:   // 无操作
-                        dataUp[2 * i + 1] = 0X00;
-                        break;
-                    case 2:    // 发射准备
-                        dataUp[2 * i + 1] = 0X01;
-                        break;
-                    case 3:    // 发射
-                        dataUp[2 * i + 1] = 0X02;
-                        break;
-                    case 4:    // 取消发射
-                        dataUp[2 * i + 1] = 0X03;
-                        break;
-                    case 5:    // 返回挂架状态
-                        dataUp[2 * i + 1] = 0X04;
-                        break;
-                    case 6:    // 调整盖板
-                        dataUp[2 * i + 1] = 0X06;
-                        break;
+                    case 1:  dataUp[2 * i + 1] = 0X00;   break;
+                    case 2:  dataUp[2 * i + 1] = 0X01;   break;
+                    case 3:  dataUp[2 * i + 1] = 0X02;   break;
+                    case 4:  dataUp[2 * i + 1] = 0X03;   break;
+                    case 5:  dataUp[2 * i + 1] = 0X04;   break;
+                    case 6:  dataUp[2 * i + 1] = 0X06;   break;
+                    case 7:  dataUp[2 * i + 1] = 0X07;   break;
                 }
             }
             else
@@ -876,306 +1102,379 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
         }).start();
     }
 
-    /* 航线飞行部分*/
-    // 航线飞行设置2019.1.26
-    private void onRouteFlightClick(){
-        // 这三行在调试时不要。  2019.2.9
-        FlightController mFlightController = GetProductApplication.getFlightControllerInstance();
-        getDroneLocation(mFlightController);    // 初始化航线飞行。
-//        cameraUpdate();
+    private void aimGimbal(boolean bPitch) {
 
-    }
-//     获取飞机位置
-    private void getDroneLocation(FlightController mFlightController){
-        if (mFlightController != null) {
-            mFlightController.setStateCallback(
-                    new FlightControllerState.Callback() {
-                        @Override
-                        public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {
-                            droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
-                            droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
-                            updateDroneLocation();
+        BaseProduct product = GetProductApplication.getProductInstance();
+        if (product != null && product.isConnected()) {
+            if (product instanceof Aircraft) {
+                mGimbal = product.getGimbal();
+//                mFlightController = ((Aircraft) product).getFlightController();
+            }
+        }
 
+        if (mGimbal != null) {
+            if (bPitch) {
+                mGimbal.setMode( GimbalMode.FPV, new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError != null) {
+                            Toast.makeText( getApplicationContext(), djiError.toString() + "Gimbal Model Error",
+                                    Toast.LENGTH_SHORT ).show();  //发送指令失败！
                         }
-                    } );
+                        Log.d( TAG_COM,"mGimbal.setMode FPV Correct  ");
+                    }
+                } );
+                final Rotation rotation = new Rotation.Builder()
+                        .mode( RotationMode.ABSOLUTE_ANGLE )
+                        .pitch( -90 )
+//                        .roll( 0 )
+//                        .yaw( 0 )
+                        .time( 1.5 )
+                        .build();
+                Log.d( TAG_COM,"pitch --> "+String.valueOf( rotation.getPitch() ));
+
+                mGimbal.rotate( rotation, new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError != null) {
+                            Toast.makeText( getApplicationContext(), djiError.toString()+" rotation Error" ,
+                                    Toast.LENGTH_LONG ).show();  //发送指令失败！
+                        }
+                    }
+                } );
+            }
+            else {
+                mGimbal.setMode( GimbalMode.FREE, new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError != null) {
+                            Toast.makeText( getApplicationContext(), djiError.toString() + "Gimbal FREE Error",
+                                    Toast.LENGTH_SHORT ).show();  //发送指令失败！
+                        }
+                        Log.d( TAG_COM,"mGimbal.setMode FREE Correct  ");
+
+                    }
+                } );
+            }
         }
     }
 
-
-    private void updateDroneLocation(){
-        final LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
-        //Create MarkerOptions object
-        final MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(pos);
-        markerOptions.icon( BitmapDescriptorFactory.fromResource(R.drawable.ic_drone));
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (droneMarker != null) {
-                    droneMarker.remove();
-                }
-                if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
-//                    aMap.addMarker(markerOptions);   // 尝试如此实现，但droneMarker 未用上。
-//                     droneMarker.setPosition( pos );   // 这个函数不知道是否可行？  2019.2.8
-                   droneMarker = aMap.addMarker(markerOptions);   // 教程上是这么写的
-                }
-            }
-        });
-    }
-    private boolean checkGpsCoordination(double latitude, double longitude) {
-        return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) && (latitude != 0f && longitude != 0f);
-    }
-//    private void cameraUpdate(){
-//        LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
-//        float zoomlevel = (float) 18.0;
-//        CameraPosition djiPos = new CameraPosition(pos,zoomlevel);
-//        CameraUpdate cu = DJICameraUpdateFactory.newCameraPosition(djiPos);  //newLatLngZoom(pos, zoomlevel);
-//        aMap.moveCamera(cu);
+    /** 航线飞行部分*/
+    // 航线飞行设置2019.1.26
+    // 在展开地图时，获取飞机对象。2019.07.06
+//    private void onRouteFlightClick(){
+//        // 这三行在调试时不要。  2019.2.9
+////        mFlightController = GetProductApplication.getFlightControllerInstance();
+////        getDroneLocation(mFlightController);    // 初始化航线飞行。
+////        cameraUpdate();
+//
 //    }
-
-    private void markWaypoint(LatLng point){
-        //Create MarkerOptions object
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(point);
-        markerOptions.icon( BitmapDescriptorFactory.fromResource(R.drawable.add_marks));
-        Marker marker = aMap.addMarker(markerOptions);
-        mMarkers.put(mMarkers.size(), marker);
-    }
-    // 航线飞行的参数设置。
-    private void showSettingDialog(){
-        LinearLayout wayPointSettings =
-                (LinearLayout)getLayoutInflater().inflate(R.layout.dialog_waypointsetting, null);
-        final TextView wpAltitude_TV = (TextView) wayPointSettings.findViewById(R.id.altitude);
-        RadioGroup speed_RG = (RadioGroup) wayPointSettings.findViewById(R.id.speed);
-        RadioGroup actionAfterFinished_RG = (RadioGroup) wayPointSettings.findViewById(R.id.actionAfterFinished);
-        RadioGroup heading_RG = (RadioGroup) wayPointSettings.findViewById(R.id.heading);
-
-        speed_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.lowSpeed){
-                    mSpeed = 3.0f;
-                } else if (checkedId == R.id.MidSpeed){
-                    mSpeed = 5.0f;
-                } else if (checkedId == R.id.HighSpeed){
-                    mSpeed = 10.0f;    // 相当于时速36KM
-                }
-            }
-        });
-
-        actionAfterFinished_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.finishNone){
-                    mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
-                } else if (checkedId == R.id.finishGoHome){
-                    mFinishedAction = WaypointMissionFinishedAction.GO_HOME;
-                } else if (checkedId == R.id.finishAutoLanding){
-                    mFinishedAction = WaypointMissionFinishedAction.AUTO_LAND;
-                } else if (checkedId == R.id.finishToFirst){
-                    mFinishedAction = WaypointMissionFinishedAction.GO_FIRST_WAYPOINT;
-                }
-            }
-        });
-
-        heading_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.headingNext) {
-                    mHeadingMode = WaypointMissionHeadingMode.AUTO;
-                } else if (checkedId == R.id.headingInitDirec) {
-                    mHeadingMode = WaypointMissionHeadingMode.USING_INITIAL_DIRECTION;
-                } else if (checkedId == R.id.headingRC) {
-                    mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
-                } else if (checkedId == R.id.headingWP) {
-                    mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
-                }
-            }
-        });
-
-        new AlertDialog.Builder(this)
-                .setTitle("")
-                .setView(wayPointSettings)
-                .setPositiveButton("确定",new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int id) {
-                        String altitudeString = wpAltitude_TV.getText().toString();
-                        altitude = Integer.parseInt(nulltoIntegerDefault(altitudeString));
-                        Log.e(TAG_COM,"altitude "+altitude);
-                        Log.e(TAG_COM,"speed "+mSpeed);
-                        Log.e(TAG_COM, "mFinishedAction "+mFinishedAction);
-                        Log.e(TAG_COM, "mHeadingMode "+mHeadingMode);
-                        configWayPointMission();
-                    }
-                })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .create()
-                .show();
-
-    }
-    String nulltoIntegerDefault(String value){
-        if(!isIntValue(value)) value="0";
-        return value;
-    }
-
-    boolean isIntValue(String val)
-    {
-        try {
-            val=val.replace(" ","");
-            Integer.parseInt(val);
-        } catch (Exception e) {return false;}
-        return true;
-    }
-
-//    public WaypointMissionOperator getWaypointMissionOperator() {
-//        if (WNOinstance == null) {
-//            WNOinstance = DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
+////    protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
+////        @Override
+////        public void onReceive(Context context, Intent intent) {
+////            onProductConnectionChange();
+////        }
+////    };
+//
+//    private void onProductConnectionChange(){
+////        BaseProduct product = GetProductApplication.getProductInstance();
+////        if (product != null && product.isConnected()) {
+////            if (product instanceof Aircraft) {
+////                mFlightController = ((Aircraft) product).getFlightController();
+//////                mFlightController = GetProductApplication.getFlightControllerInstance();
+////
+////            }
+////        }
+////
+////        if (mFlightController != null) {
+////            mFlightController.setStateCallback(
+////                    new FlightControllerState.Callback() {
+////                        @Override
+////                        public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {
+////                            droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
+////                            droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
+////                            updateDroneLocation();
+////                        }
+////                    });
+////        }
+//    }
+////     获取飞机位置
+//    private void getDroneLocation(FlightController mFlightController){
+//        if (mFlightController != null) {
+//            mFlightController.setStateCallback(
+//                    new FlightControllerState.Callback() {
+//                        @Override
+//                        public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {
+//                            droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
+//                            droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
+//                            updateDroneLocation();
+//
+//                        }
+//                    } );
 //        }
-//        return WNOinstance;
 //    }
 
-    private void configWayPointMission(){
-        if (waypointMissionBuilder == null){
-            waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
-                    .headingMode(mHeadingMode)
-                    .autoFlightSpeed(mSpeed)
-                    .maxFlightSpeed(mSpeed)
-                    .flightPathMode( WaypointMissionFlightPathMode.NORMAL);
-        }else
-        {
-            waypointMissionBuilder.finishedAction(mFinishedAction)
-                    .headingMode(mHeadingMode)
-                    .autoFlightSpeed(mSpeed)
-                    .maxFlightSpeed(mSpeed)
-                    .flightPathMode(WaypointMissionFlightPathMode.NORMAL);
-        }
-
-        if (waypointMissionBuilder.getWaypointList().size() > 0){
-            for (int i=0; i< waypointMissionBuilder.getWaypointList().size(); i++){
-                waypointMissionBuilder.getWaypointList().get(i).altitude = altitude;
-            }
-
-            Toast.makeText(CompleteWidgetActivity.this,"航线高度设置成功",Toast.LENGTH_SHORT).show();
-//            setResultToToast("Set Waypoint attitude successfully");
-        }
-
-        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
-        DJIError error = WNOinstance.loadMission(waypointMissionBuilder.build());
-//        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
-        if (error == null) {
-            Toast.makeText(CompleteWidgetActivity.this,"loadWaypoint succeeded",Toast.LENGTH_SHORT).show();
-//            setResultToToast("loadWaypoint succeeded");
-        } else {
-            Toast.makeText(CompleteWidgetActivity.this,"航线上传失败",Toast.LENGTH_SHORT).show();
-//            setResultToToast("loadWaypoint failed " + error.getDescription());
-        }
-
-    }
+//
+//    private void updateDroneLocation(){
+//        final DJILatLng pos = new DJILatLng(droneLocationLat, droneLocationLng);
+//        //Create MarkerOptions object
+//        final DJIMarkerOptions markerOptions = new DJIMarkerOptions();
+//        markerOptions.position(pos);
+//        markerOptions.icon( DJIBitmapDescriptorFactory.fromResource(R.drawable.ic_drone));
+//
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (droneMarker != null) {
+////                    droneMarker.remove();
+//                }
+//                if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
+////                    aMap.addMarker(markerOptions);   // 尝试如此实现，但droneMarker 未用上。
+////                     droneMarker.setPosition( pos );   // 这个函数不知道是否可行？  2019.2.8
+////                   droneMarker = aMap.addMarker(markerOptions);   // 教程上是这么写的
+//                }
+//            }
+//        });
+//    }
+//    private boolean checkGpsCoordination(double latitude, double longitude) {
+//        return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) && (latitude != 0f && longitude != 0f);
+//    }
+//    private void cameraUpdate(){
+//        DJILatLng pos = new DJILatLng(droneLocationLat, droneLocationLng);
+//        float zoomlevel = (float) 18.0;
+////        DJICameraUpdate cu = DJICameraUpdateFactory.newDJILatLngZoom(pos, zoomlevel);
+////        aMap.moveCamera(cu);
+//    }
+//
+//    private void markWaypoint(DJILatLng point){
+//        //Create MarkerOptions object
+//        DJIMarkerOptions markerOptions = new DJIMarkerOptions();
+//        markerOptions.position(point);
+//        markerOptions.icon( DJIBitmapDescriptorFactory.fromResource(R.drawable.add_marks));
+////        DJIMarker marker = (DJIMarker)aMap.addMarker(markerOptions);
+////        mMarkers.put(mMarkers.size(), marker);
+//    }
+//    // 航线飞行的参数设置。
+//    private void showSettingDialog(){
+//        LinearLayout wayPointSettings =
+//                (LinearLayout)getLayoutInflater().inflate(R.layout.dialog_waypointsetting, null);
+//        final TextView wpAltitude_TV = (TextView) wayPointSettings.findViewById(R.id.altitude);
+//        RadioGroup speed_RG = (RadioGroup) wayPointSettings.findViewById(R.id.speed);
+//        RadioGroup actionAfterFinished_RG = (RadioGroup) wayPointSettings.findViewById(R.id.actionAfterFinished);
+//        RadioGroup heading_RG = (RadioGroup) wayPointSettings.findViewById(R.id.heading);
+//
+//        speed_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                if (checkedId == R.id.lowSpeed){
+//                    mSpeed = 3.0f;
+//                } else if (checkedId == R.id.MidSpeed){
+//                    mSpeed = 5.0f;
+//                } else if (checkedId == R.id.HighSpeed){
+//                    mSpeed = 10.0f;    // 相当于时速36KM
+//                }
+//            }
+//        });
+//
+//        actionAfterFinished_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                if (checkedId == R.id.finishNone){
+//                    mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
+//                } else if (checkedId == R.id.finishGoHome){
+//                    mFinishedAction = WaypointMissionFinishedAction.GO_HOME;
+//                } else if (checkedId == R.id.finishAutoLanding){
+//                    mFinishedAction = WaypointMissionFinishedAction.AUTO_LAND;
+//                } else if (checkedId == R.id.finishToFirst){
+//                    mFinishedAction = WaypointMissionFinishedAction.GO_FIRST_WAYPOINT;
+//                }
+//            }
+//        });
+//
+//        heading_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                if (checkedId == R.id.headingNext) {
+//                    mHeadingMode = WaypointMissionHeadingMode.AUTO;
+//                } else if (checkedId == R.id.headingInitDirec) {
+//                    mHeadingMode = WaypointMissionHeadingMode.USING_INITIAL_DIRECTION;
+//                } else if (checkedId == R.id.headingRC) {
+//                    mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
+//                } else if (checkedId == R.id.headingWP) {
+//                    mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
+//                }
+//            }
+//        });
+//
+//        new AlertDialog.Builder(this)
+//                .setTitle("")
+//                .setView(wayPointSettings)
+//                .setPositiveButton("确定",new DialogInterface.OnClickListener(){
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        String altitudeString = wpAltitude_TV.getText().toString();
+//                        altitude = Integer.parseInt(nulltoIntegerDefault(altitudeString));
+//                        Log.e(TAG_COM,"altitude "+altitude);
+//                        Log.e(TAG_COM,"speed "+mSpeed);
+//                        Log.e(TAG_COM, "mFinishedAction "+mFinishedAction);
+//                        Log.e(TAG_COM, "mHeadingMode "+mHeadingMode);
+//                        configWayPointMission();
+//                    }
+//                })
+//                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        dialog.cancel();
+//                    }
+//                })
+//                .create()
+//                .show();
+//
+//    }
+//    String nulltoIntegerDefault(String value){
+//        if(!isIntValue(value)) value="0";
+//        return value;
+//    }
+//
+//    boolean isIntValue(String val)
+//    {
+//        try {
+//            val=val.replace(" ","");
+//            Integer.parseInt(val);
+//        } catch (Exception e) {return false;}
+//        return true;
+//    }
+//
+//    public WaypointMissionOperator getWaypointMissionOperator() {
+//        if (WMOinstance == null) {
+//            WMOinstance = DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
+//        }
+//        return WMOinstance;
+//    }
+//
+//    private void configWayPointMission(){
+//        if (waypointMissionBuilder == null){
+//            waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
+//                    .headingMode(mHeadingMode)
+//                    .autoFlightSpeed(mSpeed)
+//                    .maxFlightSpeed(mSpeed)
+//                    .flightPathMode( WaypointMissionFlightPathMode.NORMAL);
+//        }else
+//        {
+//            waypointMissionBuilder.finishedAction(mFinishedAction)
+//                    .headingMode(mHeadingMode)
+//                    .autoFlightSpeed(mSpeed)
+//                    .maxFlightSpeed(mSpeed)
+//                    .flightPathMode(WaypointMissionFlightPathMode.NORMAL);
+//        }
+//
+//        if (waypointMissionBuilder.getWaypointList().size() > 0){
+//            for (int i=0; i< waypointMissionBuilder.getWaypointList().size(); i++){
+//                waypointMissionBuilder.getWaypointList().get(i).altitude = altitude;
+//            }
+//
+//            Toast.makeText(CompleteWidgetActivity.this,"航线高度设置成功",Toast.LENGTH_SHORT).show();
+////            setResultToToast("Set Waypoint attitude successfully");
+//        }
+//
+//        WMOinstance = getWaypointMissionOperator();
+//        DJIError error = WMOinstance.loadMission(waypointMissionBuilder.build());
+////        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
+//        if (error == null) {
+//            Toast.makeText(CompleteWidgetActivity.this,"航线设置成功",Toast.LENGTH_SHORT).show();
+////            setResultToToast("loadWaypoint succeeded");
+//        } else {
+//            Toast.makeText(CompleteWidgetActivity.this,"航线设置失败",Toast.LENGTH_SHORT).show();
+////            setResultToToast("loadWaypoint failed " + error.getDescription());
+//        }
+//
+//    }
 
     //Add Listener for WaypointMissionOperator
-    private void addListener() {
+//    private void addListener() {
 //        if (getWaypointMissionOperator() != null) {
 //            getWaypointMissionOperator().addListener(eventNotificationListener);
 //        }
-        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
-        if (WNOinstance != null) {
-            WNOinstance.addListener(eventNotificationListener);
-        }
-    }
-    private void removeListener() {
+////        WaypointMissionOperator WMOinstance = getWaypointMissionOperator();
+////        if (WMOinstance != null) {
+////            WMOinstance.addListener(eventNotificationListener);
+////        }
+//    }
+//    private void removeListener() {
 //        if (getWaypointMissionOperator() != null) {
 //            getWaypointMissionOperator().removeListener(eventNotificationListener);
 //        }
-        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
-        if (WNOinstance != null) {
-            WNOinstance.removeListener(eventNotificationListener);
-        }
-    }
-    private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
-        @Override
-        public void onDownloadUpdate(WaypointMissionDownloadEvent downloadEvent) {
-        }
-        @Override
-        public void onUploadUpdate(WaypointMissionUploadEvent uploadEvent) {
-        }
-        @Override
-        public void onExecutionUpdate(WaypointMissionExecutionEvent executionEvent) {
-        }
-        @Override
-        public void onExecutionStart() {
-        }
-        @Override
-        public void onExecutionFinish(@Nullable final DJIError error) {
-            Toast.makeText(CompleteWidgetActivity.this,"执行状态： " + (error == null ?
-                    "成功！" : error.getDescription()),Toast.LENGTH_LONG).show();
-        }
-    };
-    private void uploadWayPointMission() {
-//        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
-        getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError error) {
-                if (error == null) {
-                    Toast.makeText( CompleteWidgetActivity.this, "任务上传成功！",
-                            Toast.LENGTH_SHORT ).show();
-                } else {
-                    Toast.makeText( CompleteWidgetActivity.this, "任务上传失败："
-                                    + error.getDescription() + " retrying...",
-                            Toast.LENGTH_SHORT ).show();
-                    getWaypointMissionOperator().retryUploadMission(null);
-                }
-            }
-        });
-
-    }
-
-    private void startWaypointMission(){
-        WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
-        WNOinstance.startMission(new CommonCallbacks.CompletionCallback() {
-//        getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError error) {
-                Toast.makeText(CompleteWidgetActivity.this,"航线飞行启动： " + (error == null ?
-                        "成功！" : error.getDescription()),Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void stopWaypointMission(){
-            WaypointMissionOperator WNOinstance = getWaypointMissionOperator();
-//          getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
-            WNOinstance.stopMission(new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError error) {
-                Toast.makeText(CompleteWidgetActivity.this,"航线飞行停止： " + (error == null ?
-                        "成功！" : error.getDescription()),Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-    /* 航线飞行部分 END */
-
-//    // On click event for button
-//    public void OnResizeRange(View v){
-//
-//        ViewGroup.LayoutParams params = vStatus.getLayoutParams();
-//        if (isOriginalSize)
-//        {
-//            params.height = 2 * vStatus.getHeight();
-//            params.width = 2 * vStatus.getWidth();
-//            resizeButton.setBackground(getDrawable(R.drawable.zoom_in ));
-//        } else {
-//            params.height = vStatus.getHeight()/2;
-//            params.width = vStatus.getWidth()/2;
-//            resizeButton.setBackground(getDrawable(R.drawable.zoom_out ));
+////        WaypointMissionOperator WMOinstance = getWaypointMissionOperator();
+////        if (WMOinstance != null) {
+////            WMOinstance.removeListener(eventNotificationListener);
+////        }
+//    }
+//    private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
+//        @Override
+//        public void onDownloadUpdate(WaypointMissionDownloadEvent downloadEvent) {
 //        }
-//        isOriginalSize = !isOriginalSize;
-//        vStatus.setLayoutParams(params);
+//        @Override
+//        public void onUploadUpdate(WaypointMissionUploadEvent uploadEvent) {
+//        }
+//        @Override
+//        public void onExecutionUpdate(WaypointMissionExecutionEvent executionEvent) {
+//        }
+//        @Override
+//        public void onExecutionStart() {
+//        }
+//        @Override
+//        public void onExecutionFinish(@Nullable final DJIError error) {
+//            Toast.makeText(CompleteWidgetActivity.this,"执行状态： " + (error == null ?
+//                    "成功！" : error.getDescription()),Toast.LENGTH_LONG).show();
+//        }
+//    };
+//    private void uploadWayPointMission() {
+//        Log.d( TAG_COM,"执行 uploadWayPointMission" );
+////        WaypointMissionOperator WMOinstance = getWaypointMissionOperator();
+////        getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
+//        WMOinstance.uploadMission(new CommonCallbacks.CompletionCallback() {
+//            @Override
+//            public void onResult(DJIError error) {
+//                Log.d( TAG_COM,"执行 uploadMission -- > onResult" );
+//                if (error == null) {
+//                    Log.d( TAG_COM,"执行  if (error == null) " );
+//                    Toast.makeText( getApplicationContext(), "任务上传成功！",
+//                            Toast.LENGTH_SHORT ).show();
+//                } else {
+//                    Log.d( TAG_COM,"执行   if (error != null)" );
+//                    Toast.makeText( getApplicationContext(), "任务上传失败："
+//                                    + error.getDescription() + " retrying...",
+//                            Toast.LENGTH_SHORT ).show();
+//                    getWaypointMissionOperator().retryUploadMission(null);
+//                }
+//            }
+//        });
 //
 //    }
+//
+//    private void startWaypointMission(){
+////        WaypointMissionOperator WMOinstance = getWaypointMissionOperator();
+//        WMOinstance.startMission(new CommonCallbacks.CompletionCallback() {
+////        getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
+//            @Override
+//            public void onResult(DJIError error) {
+//                Toast.makeText(CompleteWidgetActivity.this,"航线飞行启动： " + (error == null ?
+//                        "成功！" : error.getDescription()),Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+//
+//    private void stopWaypointMission(){
+////            WaypointMissionOperator WMOinstance = getWaypointMissionOperator();
+////          getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
+//            WMOinstance.stopMission(new CommonCallbacks.CompletionCallback() {
+//            @Override
+//            public void onResult(DJIError error) {
+//                Toast.makeText(CompleteWidgetActivity.this,"航线飞行停止： " + (error == null ?
+//                        "成功！" : error.getDescription()),Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+    /* 航线飞行部分 END */
+
 
     @Override
     protected void onResume() {
@@ -1190,12 +1489,13 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
                                             | View.SYSTEM_UI_FLAG_FULLSCREEN
                                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        mapView.onResume();
+        mapWidget.onResume();
+//        initFlightController();
     }
 
     @Override
     protected void onPause() {
-        mapView.onPause();
+        mapWidget.onPause();
         super.onPause();
     }
 
@@ -1228,12 +1528,12 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
 
     @Override
     protected void onDestroy() {
-        mapView.onDestroy();
+        mapWidget.onDestroy();
         // Prevent memory leak by releasing DJISDKManager's references to this activity
         if (DJISDKManager.getInstance() != null) {
             DJISDKManager.getInstance().destroy();
         }
-        removeListener();
+//        removeListener();
         ActivityCollector.removeActivity( this );
         super.onDestroy();
     }
@@ -1241,13 +1541,13 @@ public class CompleteWidgetActivity extends AppCompatActivity implements Compoun
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+        mapWidget.onSaveInstanceState(outState);
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+        mapWidget.onLowMemory();
     }
 
     private class ResizeAnimation extends Animation {

@@ -8,8 +8,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/AMap_Search_V6.5.0_20180930" />
-            <option value="$PROJECT_DIR$/Amap_2DMap_V5.2.0_20170627" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

@@ -6,7 +6,6 @@
     android:id="@+id/root_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray"
     android:visibility="visible"
     tools:context="com.dji.ImportSDKDemo.CompleteWidgetActivity">
 
@@ -14,34 +13,37 @@
     <dji.ux.widget.FPVWidget
         android:id="@+id/fpv_widget"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_height="match_parent" />
 
     <dji.ux.widget.FPVOverlayWidget
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
-
-    <!--<dji.ux.widget.MapWidget-->
-    <com.amap.api.maps2d.MapView
-        android:id="@+id/map_widget"
-        android:layout_width="141dp"
-        android:layout_height="91dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginEnd="10dp" />
+        android:layout_height="match_parent" />
 
     <dji.ux.workflow.CompassCalibratingWorkFlow
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <dji.ux.workflow.CameraSensorCleaningWorkFlow
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+    <!--<com.amap.api.maps2d.MapView-->
+    <dji.ux.widget.MapWidget
+        android:id="@+id/map_widget"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/btn_exchng"
+        android:background="@drawable/exchng"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+    <!--<dji.ux.workflow.CameraSensorCleaningWorkFlow-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentTop="true" />-->
 
     <!-- 飞机状态部分-->
     <LinearLayout
@@ -102,6 +104,7 @@
         android:layout_below="@id/signal"
         android:layout_marginStart="10dp"
         android:background="@drawable/corner_component"
+        android:visibility="visible"
         android:columnCount="4"
         android:orientation="vertical"
         android:rowCount="4">
@@ -118,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="1 号"
+            android:text="@string/a_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -132,7 +135,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="2 号"
+            android:text="@string/b_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -146,7 +149,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="3 号"
+            android:text="@string/c_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -160,7 +163,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="4 号"
+            android:text="@string/d_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -175,7 +178,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="5 号"
+            android:text="@string/e_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -189,7 +192,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="6 号"
+            android:text="@string/f_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -203,7 +206,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="7 号"
+            android:text="@string/g_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
 
@@ -217,84 +220,70 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="8 号"
+            android:text="@string/h_pylon"
             android:textColor="@color/ind_red"
             android:textSize="12dp" />
     </GridLayout>
 
-    <!-- 完全功能操作界面 TabLayout-->
+    <!-- 圆形菜单界面 Button-->
     <LinearLayout
-        android:id="@+id/all_view"
-        android:layout_width="@dimen/tab_width"
-        android:layout_height="70dp"
-        android:layout_alignEnd="@id/map_widget"
-        android:layout_below="@id/signal"
-        android:background="@drawable/corner_component"
-        android:orientation="vertical">
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/signal" >
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tablayout"
+        <com.dji.ImportSDKDemo.CircleMenuLayout
+            android:id="@+id/id_menulayout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            app:tabIndicatorColor="@color/ind_red"
-            app:tabIndicatorHeight="2dp"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/ind_red"
-            app:tabTextColor="@android:color/white" />
+            android:layout_height="match_parent"
+            android:background ="@drawable/circle_bg3">
 
-        <!--<com.dji.ImportSDKDemo.AutofitViewPager-->
-        <android.support.v4.view.ViewPager
-            android:id="@+id/tab_viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@drawable/corner_component" />
+            <RelativeLayout
+                android:id="@id/id_circle_menu_item_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/turnplate_center_unlogin" />
+
+                <ImageView
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/turnplate_mask_unlogin_normal" />
+            </RelativeLayout>
+        </com.dji.ImportSDKDemo.CircleMenuLayout>
     </LinearLayout>
-
-    <!-- 简洁操作界面 Button-->
-    <com.dji.ImportSDKDemo.CircleMenuLayout
-        android:id="@+id/id_menulayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignEnd="@id/map_widget"
-        android:layout_below="@id/signal"
-        android:background="@drawable/circle_bg3"
-        android:padding="100dp">
-
-        <RelativeLayout
-            android:id="@id/id_circle_menu_item_center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:layout_width="104.0dip"
-                android:layout_height="104.0dip"
-                android:layout_centerInParent="true"
-                android:background="@drawable/turnplate_center_unlogin" />
-
-            <ImageView
-                android:layout_width="116.0dip"
-                android:layout_height="116.0dip"
-                android:layout_centerInParent="true"
-                android:background="@drawable/turnplate_mask_unlogin_normal" />
-        </RelativeLayout>
-    </com.dji.ImportSDKDemo.CircleMenuLayout>
 
     <!-- 罗盘界面-->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="450dp"
+        android:layout_height="120dp"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
-        android:padding="5dp">
+        android:padding="0dp">
 
         <dji.ux.widget.dashboard.DashboardWidget
             android:id="@+id/Compass"
-            android:layout_width="376dp"
-            android:layout_height="91dp"
-            android:layout_marginRight="12dp"
+            android:layout_width="420dp"
+            android:layout_height="100dp"
             tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+    <!-- 准星-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"
+        android:id="@+id/aim" >
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/aim"/>
     </LinearLayout>
 
     <!-- 一键起飞与返航 -->
@@ -302,10 +291,8 @@
         android:id="@+id/TakeOffReturnPanel"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginBottom="95dp"
-        android:layout_marginStart="10dp"
         android:orientation="vertical">
 
         <dji.ux.widget.TakeOffWidget

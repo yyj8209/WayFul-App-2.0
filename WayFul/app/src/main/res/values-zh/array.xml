@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="order_test">
+        <item>Fire Ready</item>
+        <item>Fire</item>
+    </string-array>
+    <string-array name="order_type">
+        <item>None Operation</item>
+        <item>Fire Ready</item>
+        <item>Fire</item>
+    </string-array>
+    <string-array name="bomb_type">
+        <item>No Bomb</item>
+        <item>Stear</item>
+        <item>Smoke</item>
+        <item>Stun</item>
+    </string-array>
+
+</resources>

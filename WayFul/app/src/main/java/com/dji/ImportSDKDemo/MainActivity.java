@@ -3,8 +3,13 @@ package com.dji.ImportSDKDemo;
 import com.dji.ImportSDKDemo.model.Order;
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -16,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -40,12 +46,14 @@ import dji.common.util.CommonCallbacks;
 import dji.log.DJILog;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKInitEvent;
 import dji.sdk.sdkmanager.DJISDKManager;
 import dji.sdk.useraccount.UserAccountManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Main activity that displays three choices to user */
@@ -66,15 +74,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
             isRegistrationInProgress.set(false);
             if (error == DJISDKError.REGISTRATION_SUCCESS) {
                 DJISDKManager.getInstance().startConnectionToProduct();
+//                btnUI.setText("@string/registerring");
 //                Toast.makeText(getApplicationContext(), "正在注册...", Toast.LENGTH_SHORT).show();
-                loginAccount();
+//                loginAccount();
                 btnUI.setText("进入程序");
                 btnUI.setBackgroundColor( Color.parseColor("#60CC60"));
 //                btnUI.setBackground(getDrawable( R.drawable.corner_green_btn) );
 
             } else {
-                Toast.makeText(getApplicationContext(),
-                               "注册失败，请检查网络。",
+                Toast.makeText(getApplicationContext(),"Register error, please check the internet",
                                Toast.LENGTH_LONG).show();
             }
         }
@@ -141,6 +149,33 @@ public class MainActivity extends Activity implements View.OnClickListener{
         btnUI.setOnClickListener(this);
 
         checkAndRequestPermissions();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction( GetProductApplication.FLAG_CONNECTION_CHANGE );
+        registerReceiver( mReceiver,filter );
+
+    }
+    protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            refreshSDKRelativeUI();
+        }
+    };
+
+    private void refreshSDKRelativeUI() {
+        BaseProduct mProduct = GetProductApplication.getProductInstance();
+
+        if (null != mProduct && mProduct.isConnected()) {
+            Log.v(TAG, "refreshSDK: True");
+
+            String str = mProduct instanceof Aircraft ? "DJIAircraft" : "DJIHandHeld";
+            Toast.makeText(getApplicationContext(),"Status: " + str + " connected",
+                    Toast.LENGTH_LONG).show();
+
+        } else {
+            Log.v(TAG, "refreshSDK: False");
+        }
     }
 
     @Override
@@ -149,8 +184,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if (DJISDKManager.getInstance() != null) {
             DJISDKManager.getInstance().destroy();
         }
-        super.onDestroy();
+        unregisterReceiver( mReceiver );
         ActivityCollector.removeActivity( this );
+        super.onDestroy();
     }
 
     private void loginAccount(){
@@ -162,7 +198,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     }
                     @Override
                     public void onFailure(DJIError error) {
-                        Toast.makeText(getApplicationContext(), "注册失败…", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), "注册失败…", Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -206,13 +242,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "onRequestPermissionsResult 失败!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "onRequestPermissionsResult Error!", Toast.LENGTH_LONG).show();
         }
         // If there is enough permission, we will start the registration
         if (missingPermission.isEmpty()) {
             startSDKRegistration();
         } else {
-            Toast.makeText(getApplicationContext(), "设备未授权!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), " Unwarrantted!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -227,12 +263,19 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
         else
         {
-            Toast.makeText(getApplicationContext(), "startSDKRegistration 失败!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "startSDKRegistration Error!", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public void onClick(View view) {
+        // 这一段是多国语言包切换。2020.01.05
+        Locale myLocale = new Locale("en");   //  'en'
+        Resources res = getResources();// 获得res资源对象
+        DisplayMetrics dm = res.getDisplayMetrics();// 获得屏幕参数：主要是分辨率，像素等。
+        Configuration conf = res.getConfiguration();// 获得设置对象
+        conf.locale = myLocale;// 简体中文
+        res.updateConfiguration(conf, dm);
 
         int id = view.getId();
         if (id == R.id.complete_ui_widgets) {

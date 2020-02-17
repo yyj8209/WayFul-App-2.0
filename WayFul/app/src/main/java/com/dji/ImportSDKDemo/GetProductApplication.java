@@ -16,6 +16,7 @@ import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.flightcontroller.FlightController;
+import dji.sdk.gimbal.Gimbal;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
 import dji.sdk.products.HandHeld;
@@ -23,9 +24,10 @@ import dji.sdk.sdkmanager.DJISDKManager;
 
 public class GetProductApplication extends Application{
     public static final String FLAG_GET_PRODUCT = "get_product";
-
+    public static final String FLAG_CONNECTION_CHANGE = "dji_sdk_connection_change";
     private static BaseProduct mProduct;
-
+    private static FlightController mFlightController;
+//    private static Gimbal mGimbal;
     private Application instance;
 
     private static WaypointMissionOperator WNOinstance;
@@ -54,14 +56,24 @@ public class GetProductApplication extends Application{
         return mProduct;
     }
 
+
     public static synchronized FlightController getFlightControllerInstance() {
 
         if (getProductInstance() == null) return null;
 
-        FlightController mFlightController = ((Aircraft) getProductInstance()).getFlightController();
+        mFlightController = ((Aircraft) getProductInstance()).getFlightController();
 
         return mFlightController;
     }
+
+//    public static synchronized Gimbal getGimbal() {
+//
+//        if (getProductInstance() == null) return null;
+//
+//        mGimbal = ((Gimbal) getProductInstance()).;
+//
+//        return mGimbal;
+//    }
 
     public static synchronized WaypointMissionOperator getWaypointMissionOperator() {
         if (WNOinstance == null) {
