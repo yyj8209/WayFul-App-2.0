@@ -293,86 +293,86 @@ public class CircleMenuLayout extends ViewGroup
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event)
 	{
-		float x = event.getX();
-		float y = event.getY();
-
-		// Log.e("TAG", "x = " + x + " , y = " + y);
-
-		switch (event.getAction())
-		{
-		case MotionEvent.ACTION_DOWN:
-
-			mLastX = x;
-			mLastY = y;
-			mDownTime = System.currentTimeMillis();
-			mTmpAngle = 0;
-
-			// 如果当前已经在快速滚动
-			if (isFling)
-			{
-				// 移除快速滚动的回调
-				removeCallbacks(mFlingRunnable);
-				isFling = false;
-				return true;
-			}
-
-			break;
-		case MotionEvent.ACTION_MOVE:
-
-			/**
-			 * 获得开始的角度
-			 */
-			float start = getAngle(mLastX, mLastY);
-			/**
-			 * 获得当前的角度
-			 */
-			float end = getAngle(x, y);
-
-			// Log.e("TAG", "start = " + start + " , end =" + end);
-			// 如果是一、四象限，则直接end-start，角度值都是正值
-			if (getQuadrant(x, y) == 1 || getQuadrant(x, y) == 4)
-			{
-				mStartAngle += end - start;
-				mTmpAngle += end - start;
-			} else
-			// 二、三象限，色角度值是付值
-			{
-				mStartAngle += start - end;
-				mTmpAngle += start - end;
-			}
-			// 重新布局
-			requestLayout();
-
-			mLastX = x;
-			mLastY = y;
-
-			break;
-		case MotionEvent.ACTION_UP:
-
-			// 计算，每秒移动的角度
-			float anglePerSecond = mTmpAngle * 1000
-					/ (System.currentTimeMillis() - mDownTime);
-
-			// Log.e("TAG", anglePrMillionSecond + " , mTmpAngel = " +
-			// mTmpAngle);
-
-			// 如果达到该值认为是快速移动
-			if (Math.abs(anglePerSecond) > mFlingableValue && !isFling)
-			{
-				// post一个任务，去自动滚动
-				post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
-
-				return true;
-			}
-
-			// 如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
-			if (Math.abs(mTmpAngle) > NOCLICK_VALUE)
-			{
-				return true;
-			}
-
-			break;
-		}
+//		float x = event.getX();
+//		float y = event.getY();
+//
+//		// Log.e("TAG", "x = " + x + " , y = " + y);
+//
+//		switch (event.getAction())
+//		{
+//		case MotionEvent.ACTION_DOWN:
+//
+//			mLastX = x;
+//			mLastY = y;
+//			mDownTime = System.currentTimeMillis();
+//			mTmpAngle = 0;
+//
+//			// 如果当前已经在快速滚动
+//			if (isFling)
+//			{
+//				// 移除快速滚动的回调
+//				removeCallbacks(mFlingRunnable);
+//				isFling = false;
+//				return true;
+//			}
+//
+//			break;
+//		case MotionEvent.ACTION_MOVE:
+//
+//			/**
+//			 * 获得开始的角度
+//			 */
+//			float start = getAngle(mLastX, mLastY);
+//			/**
+//			 * 获得当前的角度
+//			 */
+//			float end = getAngle(x, y);
+//
+//			// Log.e("TAG", "start = " + start + " , end =" + end);
+//			// 如果是一、四象限，则直接end-start，角度值都是正值
+//			if (getQuadrant(x, y) == 1 || getQuadrant(x, y) == 4)
+//			{
+//				mStartAngle += end - start;
+//				mTmpAngle += end - start;
+//			} else
+//			// 二、三象限，色角度值是付值
+//			{
+//				mStartAngle += start - end;
+//				mTmpAngle += start - end;
+//			}
+//			// 重新布局
+//			requestLayout();
+//
+//			mLastX = x;
+//			mLastY = y;
+//
+//			break;
+//		case MotionEvent.ACTION_UP:
+//
+//			// 计算，每秒移动的角度
+//			float anglePerSecond = mTmpAngle * 1000
+//					/ (System.currentTimeMillis() - mDownTime);
+//
+//			// Log.e("TAG", anglePrMillionSecond + " , mTmpAngel = " +
+//			// mTmpAngle);
+//
+//			// 如果达到该值认为是快速移动
+//			if (Math.abs(anglePerSecond) > mFlingableValue && !isFling)
+//			{
+//				// post一个任务，去自动滚动
+//				post(mFlingRunnable = new AutoFlingRunnable(anglePerSecond));
+//
+//				return true;
+//			}
+//
+//			// 如果当前旋转角度超过NOCLICK_VALUE屏蔽点击
+//			if (Math.abs(mTmpAngle) > NOCLICK_VALUE)
+//			{
+//				return true;
+//			}
+//
+//			break;
+//		}
 		return super.dispatchTouchEvent(event);
 	}
 
@@ -425,7 +425,7 @@ public class CircleMenuLayout extends ViewGroup
 	 * 
 	 * @param resIds
 	 */
-	public void setMenuItemIconsAndTexts(int[] resIds, String[] texts)
+	public void setMenuItemIconsAndTexts(int[] resIds, String[] texts,boolean bAdd)
 	{
 		mItemImgs = resIds;
 		mItemTexts = texts;
@@ -444,7 +444,7 @@ public class CircleMenuLayout extends ViewGroup
 			mMenuItemCount = Math.min(resIds.length, texts.length);
 		}
 
-		addMenuItems();
+		addMenuItems(bAdd);
 
 	}
 
@@ -461,7 +461,7 @@ public class CircleMenuLayout extends ViewGroup
 	/**
 	 * 添加菜单项
 	 */
-	private void addMenuItems()
+	private void addMenuItems(boolean bAdd)
 	{
 		LayoutInflater mInflater = LayoutInflater.from(getContext());
 
@@ -470,8 +470,9 @@ public class CircleMenuLayout extends ViewGroup
 		 */
 		for (int i = 0; i < mMenuItemCount; i++)
 		{
-			final int j = i;
 			View view = mInflater.inflate(mMenuItemLayoutId, this, false);
+			if(!bAdd) removeViewAt(i);
+			final int j = i;
 			ImageView iv = (ImageView) view
 					.findViewById(R.id.id_circle_menu_item_image);
 			TextView tv = (TextView) view
@@ -503,7 +504,57 @@ public class CircleMenuLayout extends ViewGroup
 			}
 
 			// 添加view到容器中
-			addView(view);
+			addView(view,i);
+		}
+	}
+
+	/**
+	 * 添加菜单项
+	 */
+	private void updateMenuItems()
+	{
+		LayoutInflater mInflater = LayoutInflater.from(getContext());
+
+		/**
+		 * 根据用户设置的参数，初始化view
+		 */
+		for (int i = 0; i < mMenuItemCount; i++)
+		{
+			final int j = i;
+			View view = mInflater.inflate(mMenuItemLayoutId, this, false);
+			removeViewAt(i);
+			ImageView iv = (ImageView) view
+					.findViewById(R.id.id_circle_menu_item_image);
+			TextView tv = (TextView) view
+					.findViewById(R.id.id_circle_menu_item_text);
+
+			if (iv != null)
+			{
+				iv.setVisibility(View.VISIBLE);
+				iv.setImageResource(mItemImgs[i]);
+				iv.setOnClickListener(new OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+					{
+
+						if (mOnMenuItemClickListener != null)
+						{
+							mOnMenuItemClickListener.itemClick(v, j);
+						}
+					}
+				});
+			}
+			if (tv != null)
+			{
+				tv.setVisibility(View.VISIBLE);
+				tv.setTextSize( 10 );
+				tv.setTextColor( Color.BLUE );
+				tv.setText(mItemTexts[i]);
+			}
+
+			// 添加view到容器中
+			addView(view,i);
 		}
 	}
 

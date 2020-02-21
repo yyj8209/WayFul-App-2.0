@@ -30,8 +30,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -60,7 +62,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MainActivity extends Activity implements View.OnClickListener{
     private static final String TAG = "MainActivity";
     private AtomicBoolean isRegistrationInProgress = new AtomicBoolean(false);
-    Button btnUI = null;
+    private Button btnUI;
+    private Switch swchLanguage;
+    private String strLanguage = "中文";
     private DJISDKManager.SDKManagerCallback registrationCallback = new DJISDKManager.SDKManagerCallback() {
 
         // 又遇到不注册的问题，断点设在这里没有反应，我检查了网络，重启了手机，改回compileSdkVersion，没有效果。重新同步dji-uxsdk包，没有效果。Debug，
@@ -147,6 +151,21 @@ public class MainActivity extends Activity implements View.OnClickListener{
         ActivityCollector.addActivity( this );
         btnUI = (Button) findViewById(R.id.complete_ui_widgets);
         btnUI.setOnClickListener(this);
+        swchLanguage = (Switch)findViewById(R.id.switch_language);
+        swchLanguage.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked) {
+                    strLanguage = "中文";
+                    Log.e(TAG,"语言"+strLanguage);
+                    LanguageUtil.updateLocale(MainActivity.this, LanguageUtil.LOCALE_CHINESE);
+                }else {
+                    strLanguage = "EN";
+                    Log.e(TAG,"语言"+strLanguage);
+                    LanguageUtil.updateLocale(MainActivity.this, LanguageUtil.LOCALE_ENGLISH);
+                }
+            }
+        });
 
         checkAndRequestPermissions();
 
@@ -269,19 +288,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        // 这一段是多国语言包切换。2020.01.05
-        Locale myLocale = new Locale("en");   //  'en'
-        Resources res = getResources();// 获得res资源对象
-        DisplayMetrics dm = res.getDisplayMetrics();// 获得屏幕参数：主要是分辨率，像素等。
-        Configuration conf = res.getConfiguration();// 获得设置对象
-        conf.locale = myLocale;// 简体中文
-        res.updateConfiguration(conf, dm);
-
         int id = view.getId();
         if (id == R.id.complete_ui_widgets) {
             Class nextActivityClass;
             nextActivityClass = CompleteWidgetActivity.class;
             Intent intent = new Intent(this, nextActivityClass);
+            intent.putExtra("app_language",strLanguage);
 //            intent.setFlags( Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
         }

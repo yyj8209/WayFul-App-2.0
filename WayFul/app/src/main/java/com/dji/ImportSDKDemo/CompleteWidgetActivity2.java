@@ -178,7 +178,7 @@ public class CompleteWidgetActivity2 extends AppCompatActivity implements Compou
 
     // 初始化圆形菜单
     private void initCircleMenu(CircleMenuLayout mCircleMenuLayout){
-        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts);
+        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts,true);
         mCircleMenuLayout.setOnMenuItemClickListener(new OnMenuItemClickListener()
         {
             @Override

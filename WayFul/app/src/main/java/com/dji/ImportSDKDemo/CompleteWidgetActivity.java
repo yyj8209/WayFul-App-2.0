@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -107,6 +108,8 @@ import com.dji.mapkit.core.models.DJIBitmapDescriptorFactory;
 import com.dji.mapkit.core.models.DJILatLng;
 import com.dji.mapkit.core.models.annotations.DJIMarker;
 import com.dji.mapkit.core.models.annotations.DJIMarkerOptions;
+import com.google.android.gms.common.util.Strings;
+
 import dji.sdk.gimbal.Gimbal;
 
 /** Activity that shows all the UI elements together */
@@ -120,6 +123,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 
     protected static final String TAG_COM = "CompleteWidgetActivity";
     public static final int PYLON_NUM = 8;
+    private String language = "";
 
     private MapWidget mapWidget;
     private DJIMap aMap;
@@ -138,6 +142,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
     private CheckBox [] cb = new CheckBox[PYLON_NUM];   // 测试复选框显示图片。
     private boolean [] cbChecked = new boolean[PYLON_NUM];   // 判断是否选中。
     private  byte[] dataDown,dataUp,dataDownOld;
+    private boolean bSendOrder = true;
     private int[] imagePath;
     private ArrayList<String> sTemp = new ArrayList<String>();  // 临时的可变长度字符数组，存储发射准备和发射的挂架名。
     private ArrayList<Integer> nTemp = new ArrayList<Integer>(); // 临时的可变长度整型数组，存储发射准备和发射的挂架号。
@@ -172,7 +177,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 //            "清除航点", "航线飞行", "停止航飞", "更多设置" };
     private String[] mItemTexts = new String[] { };
     private int[] mItemImgs = new int[] { };
-    private boolean bLight = false, bBlink = false, bShout = false;
+    private boolean bLightState = false, bBlinkState = false, bShoutState = false;
 //            R.drawable.clear, R.drawable.start,
 //            R.drawable.stop, R.drawable.settings };
 
@@ -181,6 +186,14 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_default_widgets );
         ActivityCollector.addActivity( this );
+
+        Intent intent = getIntent();
+        language = intent.getStringExtra("app_language");
+        Log.e(TAG_COM,"语言"+language);
+        if(language.contains("中文"))
+            LanguageUtil.updateLocale(CompleteWidgetActivity.this, LanguageUtil.LOCALE_CHINESE);
+        else
+            LanguageUtil.updateLocale(CompleteWidgetActivity.this, LanguageUtil.LOCALE_ENGLISH);
 
         height = DensityUtil.dip2px( this, 100 );
         width = DensityUtil.dip2px( this, 150 );
@@ -226,15 +239,15 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 
         mCircleMenuLayout = (CircleMenuLayout) findViewById(R.id.id_menulayout);
         mItemTexts = new String[] { getResources().getString( R.string.status_refresh ),
-                getResources().getString( R.string.focus), getResources().getString( R.string.pylon_off),
+                getResources().getString( R.string.aim_on), getResources().getString( R.string.pylon_off),
                 getResources().getString( R.string.light_on), getResources().getString( R.string.blink_on),
                 getResources().getString( R.string.shout_on), getResources().getString( R.string.reserved) };
         mItemImgs = new int[] { R.drawable.downchannel,
                 R.drawable.add, R.drawable.upload,
-                R.drawable.light, R.drawable.blink,
-                R.drawable.loudspeaker, R.drawable.settings };
-        updateCircleMenuUI(mCircleMenuLayout);
-        initCircleMenu(mCircleMenuLayout);
+                R.drawable.light_off, R.drawable.blink_off,
+                R.drawable.shout_off, R.drawable.settings };
+        updateCircleMenuUI(true );
+        initCircleMenu( );
 
         mFlightController = GetProductApplication.getFlightControllerInstance();
 //        initTabLayoutView();   // 导航栏初始化。
@@ -242,20 +255,22 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 //        addListener();    // 对添加航线飞行目标点的监视。    2019.2.9
     }
     // 初始化圆形菜单界面
-    private void updateCircleMenuUI(CircleMenuLayout mCircleMenuLayout){
-        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts);
+    private void updateCircleMenuUI(boolean bAdd ){
+        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts,bAdd);
+
         Log.e(TAG_COM,"菜单调试：updateCircleMenuUI");
     }
     // 清除圆形菜单界面
-    private void clearCircleMenuUI(CircleMenuLayout mCircleMenuLayout){
+    private void clearCircleMenuUI( ){
         int []mItemImg = new int[]{};
         String []mItemText = new String[]{};
-        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImg, mItemText);
+        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImg, mItemText,false);
         Log.e(TAG_COM,"菜单调试：clearCircleMemuUI");
     }
     // 设置菜单的响应函数
-    private void initCircleMenu(final CircleMenuLayout mCircleMenuLayout){
-//        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts);
+    private void initCircleMenu( ){
+        bSendOrder = true;
+        Log.e(TAG_COM,"菜单调试：initCircleMenu 功能响应");
         mCircleMenuLayout.setOnMenuItemClickListener(new OnMenuItemClickListener()
         {
             @Override
@@ -272,7 +287,6 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                         onDataFromOnboardToMSDK();     // 这个函数放在OnCreate中合适，调试阶段放在这里。
                         for (int i = 0; i < dataUp.length / 2; i++)
                             dataUp[2 * i + 1] = 0X05;
-//                        onDataFromMSDKToOSDK( dataUp );
                         showProgressDialog();
                         break;
                     case 2:
@@ -284,70 +298,74 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                             findViewById( R.id.aim ).setVisibility( View.VISIBLE );
                             aimGimbal(true);   // 云台锁定相机方向
                         }
+                        bSendOrder = false;
                         break;
                     case 3:
                         if(View.VISIBLE == findViewById( R.id.status).getVisibility()) {
                             findViewById( R.id.status ).setVisibility( View.INVISIBLE );
                             mItemTexts[2] = getResources().getString(R.string.pylon_on) ;
+                            Log.e(TAG_COM,"菜单调式：隐弹仓");
                         }
                         else {
                             findViewById( R.id.status ).setVisibility( View.VISIBLE );
                             mItemTexts[2] = getResources().getString(R.string.pylon_off);
+                            Log.e(TAG_COM,"菜单调式：显弹仓");
                         }
-                        Log.e(TAG_COM,"菜单调式：隐显弹仓");
+                        bSendOrder = false;
                         break;
                     case 4:
-                        if(!bLight) {
+                        if(!bLightState) {
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X01;   // 照明
-//                            onDataFromMSDKToOSDK( dataUp );
-                            mItemTexts[3] = getResources().getString(R.string.light_on);
-                            mItemImgs[3] = R.drawable.light;
-                            bLight = true;
+                            mItemTexts[3] = getResources().getString(R.string.light_off);
+                            mItemImgs[3] = R.drawable.light_on;
+                            bLightState = true;
+                            Log.e(TAG_COM,"菜单调式：开照明");
                         }
                         else{
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X06;   // 关闭照明
-//                            onDataFromMSDKToOSDK( dataUp );
-                            mItemTexts[3] = getResources().getString(R.string.light_off);
-                            mItemImgs[3] = R.drawable.blink;
-                            bLight = false;
+                            mItemTexts[3] = getResources().getString(R.string.light_on);
+                            mItemImgs[3] = R.drawable.light_off;
+                            bLightState = false;
+                            Log.e(TAG_COM,"菜单调式：关照明");
                         }
-                        Log.e(TAG_COM,"菜单调式：开关照明");
                         break;
                     case 5:
-                        if(!bBlink) {
+                        if(!bBlinkState) {
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X03;   // 闪光
-//                            onDataFromMSDKToOSDK( dataUp );
                             mItemTexts[4] = getResources().getString(R.string.blink_on);
-                            bBlink = true;
+                            mItemImgs[4] = R.drawable.blink_off;
+                            bBlinkState = true;
+                            Log.e(TAG_COM,"菜单调式：开闪光");
                         }
                         else{
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X03;   // 关闭闪光
-//                            onDataFromMSDKToOSDK( dataUp );
                             mItemTexts[4] = getResources().getString(R.string.blink_off);
-                            bBlink = false;
+                            mItemImgs[4] = R.drawable.blink_on;
+                            bBlinkState = false;
+                            Log.e(TAG_COM,"菜单调式：关闪光");
                         }
-                        Log.e(TAG_COM,"菜单调式：开关闪光");
                         break;
                     case 6:
-                        if(!bShout) {
+                        if(!bShoutState) {
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X04;   // 喊话
-//                            onDataFromMSDKToOSDK( dataUp );
                             mItemTexts[5] = getResources().getString(R.string.shout_on);
-                            bShout = true;
+                            mItemImgs[5] = R.drawable.shout_off;
+                            bShoutState = true;
+                            Log.e(TAG_COM,"菜单调式：开喊话");
                         }
                         else{
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X07;   // 关闭喊话
-//                            onDataFromMSDKToOSDK( dataUp );
                             mItemTexts[5] = getResources().getString(R.string.shout_off);
-                            bShout = false;
+                            mItemImgs[5] = R.drawable.shout_on;
+                            bShoutState = false;
+                            Log.e(TAG_COM,"菜单调式：关喊话");
                         }
-                        Log.e(TAG_COM,"菜单调式：开关喊话");
                         break;
                     case 7:
                         Toast.makeText( CompleteWidgetActivity.this, getResources().getString( R.string.reserved ),
@@ -355,13 +373,12 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 //                        // 1-无操作，2-照明，3-发射，4-闪光，5-喊话，6-发射，7-激光。
 //                        for (int i = 0; i < dataUp.length / 2; i++)
 //                            dataUp[2 * i + 1] = 0X06;   // 激光
-//                        onDataFromMSDKToOSDK(dataUp);
                         break;
                     default:
                         break;
                 }
-//                clearCircleMenuUI( mCircleMenuLayout );
-//                updateCircleMenuUI( mCircleMenuLayout );
+//                if(bSendOrder) onDataFromMSDKToOSDK( dataUp );
+                updateCircleMenuUI( false );
             }
 
             @Override
