@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/down_active"
+        android:title="激活下行链路">
+    </item>
+    <item
+        android:id="@+id/down_check"
+        android:title="下行链路测试">
+    </item>
+    <item
+        android:id="@+id/marks_show"
+        android:title="操作记录">
+    </item>
+    <item
+        android:id="@+id/marks_export"
+        android:title="导出记录">
+    </item>
+    <item
+        android:id="@+id/exit"
+        android:title="退出">
+    </item>
+
+</menu>

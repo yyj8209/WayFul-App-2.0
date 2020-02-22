@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible"
+    tools:context="com.dji.ImportSDKDemo.CompleteWidgetActivity">
+
+    <!-- Widget to see first person view (FPV) -->
+    <dji.ux.widget.FPVWidget
+        android:id="@+id/fpv_widget"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <dji.ux.widget.FPVOverlayWidget
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <dji.ux.workflow.CompassCalibratingWorkFlow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!--<com.amap.api.maps2d.MapView-->
+    <dji.ux.widget.MapWidget
+        android:id="@+id/map_widget"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/btn_exchng"
+        android:background="@drawable/exchng"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
+    <!--<dji.ux.workflow.CameraSensorCleaningWorkFlow-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentTop="true" />-->
+
+    <!-- 飞机状态部分-->
+    <LinearLayout
+        android:id="@+id/signal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@color/dark_gray"
+        android:orientation="horizontal">
+
+        <dji.ux.widget.PreFlightStatusWidget
+            android:layout_width="238dp"
+            android:layout_height="25dp" />
+
+        <dji.ux.widget.FlightModeWidget
+            android:layout_width="103dp"
+            android:layout_height="22dp" />
+
+        <dji.ux.widget.GPSSignalWidget
+            android:layout_width="44dp"
+            android:layout_height="22dp" />
+
+        <dji.ux.widget.VisionWidget
+            android:layout_width="22dp"
+            android:layout_height="22dp" />
+
+        <dji.ux.widget.RemoteControlSignalWidget
+            android:layout_width="38dp"
+            android:layout_height="22dp" />
+
+        <dji.ux.widget.VideoSignalWidget
+            android:layout_width="38dp"
+            android:layout_height="22dp" />
+
+        <dji.ux.widget.BatteryWidget
+            android:layout_width="96dp"
+            android:layout_height="22dp"
+            custom:excludeView="singleVoltage" />
+
+        <dji.ux.widget.ConnectionWidget
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="3dp" />
+    </LinearLayout>
+
+    <!-- 剩余飞行时间-->
+    <dji.ux.widget.RemainingFlightTimeWidget
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="18dp"
+        android:background="@color/transparent" />
+
+    <!-- 弹仓显示部分-->
+    <GridLayout
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signal"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/corner_component"
+        android:visibility="visible"
+        android:columnCount="4"
+        android:orientation="vertical"
+        android:rowCount="4">
+
+        <!--   2018.10.05 在Activity 初始化时加载图片，便于实时更新。-->
+        <!-- 1号弹状态及控制 左边空隙 5dp -->
+        <CheckBox
+            android:id="@+id/checkbox1"
+            style="@style/pyloncheckbox1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/a_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox2"
+            style="@style/pyloncheckbox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/b_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox3"
+            style="@style/pyloncheckbox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/c_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox4"
+            style="@style/pyloncheckbox4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/d_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <!-- 5号弹状态及控制 -->
+        <CheckBox
+            android:id="@+id/checkbox5"
+            style="@style/pyloncheckbox5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/e_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox6"
+            style="@style/pyloncheckbox6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/f_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox7"
+            style="@style/pyloncheckbox7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/g_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+
+        <CheckBox
+            android:id="@+id/checkbox8"
+            style="@style/pyloncheckbox8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/h_pylon"
+            android:textColor="@color/ind_red"
+            android:textSize="12dp" />
+    </GridLayout>
+
+    <!-- 圆形菜单界面 Button-->
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/signal" >
+
+        <com.dji.ImportSDKDemo.CircleMenuLayout
+            android:id="@+id/id_menulayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background ="@drawable/circle_bg3">
+
+            <RelativeLayout
+                android:id="@id/id_circle_menu_item_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/turnplate_center_unlogin" />
+
+                <ImageView
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/turnplate_mask_unlogin_normal" />
+            </RelativeLayout>
+        </com.dji.ImportSDKDemo.CircleMenuLayout>
+    </LinearLayout>
+
+    <!-- 罗盘界面-->
+    <LinearLayout
+        android:layout_width="450dp"
+        android:layout_height="120dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="0dp">
+
+        <dji.ux.widget.dashboard.DashboardWidget
+            android:id="@+id/Compass"
+            android:layout_width="420dp"
+            android:layout_height="100dp"
+            tools:ignore="RtlHardcoded" />
+    </LinearLayout>
+
+    <!-- 准星-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"
+        android:id="@+id/aim" >
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/aim"/>
+    </LinearLayout>
+
+    <!-- 一键起飞与返航 -->
+    <LinearLayout
+        android:id="@+id/TakeOffReturnPanel"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <dji.ux.widget.TakeOffWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="0dp" />
+
+        <dji.ux.widget.ReturnHomeWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp" />
+    </LinearLayout>
+
+    <!--
+
+    <dji.ux.widget.controls.PictureVideoSwitch
+        android:id="@+id/CameraCapturePanel1"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/fire"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="40dp"
+        android:visibility="visible"
+        tools:ignore="RtlHardcoded" />
+
+    <dji.ux.widget.controls.CameraCaptureWidget
+        android:id="@+id/CameraCapturePanel2"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/CameraCapturePanel1"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="30dp"
+        android:visibility="visible"
+        tools:ignore="RtlHardcoded" />
+-->
+
+    <!-- Pre-flight checklist panel -->
+    <dji.ux.panel.PreFlightCheckListPanel
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signal"
+        android:visibility="gone"
+        custom:excludeItem="ESCStatus" />
+
+</RelativeLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="3dp"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/btnAddMarks"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="添加"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btnUpload"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="上传"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btnClearMarks"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="清除"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="飞行"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="停止"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/button_txtsize" />
+
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="设置"
+        android:background="@drawable/corner_blue_btn"
+        android:textColor="@color/white"
+        android:textSize="@dimen/button_txtsize" />
+</LinearLayout>

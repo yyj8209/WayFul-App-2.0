@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="航线飞行设置"
+        android:textSize="18dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal">
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="飞行高度: "></TextView>
+
+        <EditText
+            android:id="@+id/altitude"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:textSize="14dp"
+            android:layout_gravity="center"></EditText>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" 米"></TextView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="飞行速度:"></TextView>
+
+        <RadioGroup
+            android:id="@+id/speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/lowSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="低速" />
+
+        <RadioButton
+            android:id="@+id/MidSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="中速" />
+
+        <RadioButton
+            android:id="@+id/HighSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="高速" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="到达后操作:" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal" >
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/actionAfterFinished"
+            android:layout_gravity="center_horizontal">
+        <RadioButton
+            android:id="@+id/finishNone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="无操作"/>
+        <RadioButton
+            android:id="@+id/finishGoHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="自动返回"/>
+        <RadioButton
+            android:id="@+id/finishAutoLanding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="自动着陆"/>
+        <RadioButton
+            android:id="@+id/finishToFirst"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="回第一点"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="机头朝向:"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal" >
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/heading"
+            android:layout_gravity="center_horizontal">
+        <RadioButton
+            android:id="@+id/headingNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="下个目标"/>
+        <RadioButton
+            android:id="@+id/headingInitDirec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="初始朝向"/>
+        <RadioButton
+            android:id="@+id/headingRC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="遥控确定"/>
+        <RadioButton
+            android:id="@+id/headingWP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="5pt"
+            android:text="使用航线"/>
+        </RadioGroup>
+    </LinearLayout>
+</LinearLayout>

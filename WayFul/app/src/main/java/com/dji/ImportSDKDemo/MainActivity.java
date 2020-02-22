@@ -81,7 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 //                btnUI.setText("@string/registerring");
 //                Toast.makeText(getApplicationContext(), "正在注册...", Toast.LENGTH_SHORT).show();
 //                loginAccount();
-                btnUI.setText("进入程序");
+                btnUI.setText(getResources().getString( R.string.start ));
                 btnUI.setBackgroundColor( Color.parseColor("#60CC60"));
 //                btnUI.setBackground(getDrawable( R.drawable.corner_green_btn) );
 
@@ -157,12 +157,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(!isChecked) {
                     strLanguage = "中文";
-                    Log.e(TAG,"语言"+strLanguage);
+//                    Log.e(TAG,"语言"+strLanguage);
                     LanguageUtil.updateLocale(MainActivity.this, LanguageUtil.LOCALE_CHINESE);
+                    btnUI.setText( getResources().getString( R.string.start ) );
                 }else {
                     strLanguage = "EN";
-                    Log.e(TAG,"语言"+strLanguage);
                     LanguageUtil.updateLocale(MainActivity.this, LanguageUtil.LOCALE_ENGLISH);
+                    btnUI.setText( getResources().getString( R.string.start ) );
                 }
             }
         });

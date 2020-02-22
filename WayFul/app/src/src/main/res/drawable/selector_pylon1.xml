@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/bomb_empty_checked" android:state_checked="true">
+    <shape>
+        <solid android:color="@color/blue" />
+        <stroke android:width="1dp" android:color="@color/blue" />
+    </shape>
+    </item>
+    <item android:drawable="@drawable/bomb_empty" android:state_checked="false"/>
+
+</selector>

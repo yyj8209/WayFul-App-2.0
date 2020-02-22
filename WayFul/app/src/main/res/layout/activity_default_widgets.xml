@@ -120,6 +120,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon1"
             android:layout_gravity="center"
             android:text="@string/a_pylon"
             android:textColor="@color/ind_red"
@@ -134,6 +135,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon2"
             android:layout_gravity="center"
             android:text="@string/b_pylon"
             android:textColor="@color/ind_red"
@@ -148,6 +150,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon3"
             android:layout_gravity="center"
             android:text="@string/c_pylon"
             android:textColor="@color/ind_red"
@@ -162,6 +165,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon4"
             android:layout_gravity="center"
             android:text="@string/d_pylon"
             android:textColor="@color/ind_red"
@@ -177,6 +181,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon5"
             android:layout_gravity="center"
             android:text="@string/e_pylon"
             android:textColor="@color/ind_red"
@@ -191,6 +196,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon6"
             android:layout_gravity="center"
             android:text="@string/f_pylon"
             android:textColor="@color/ind_red"
@@ -205,6 +211,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon7"
             android:layout_gravity="center"
             android:text="@string/g_pylon"
             android:textColor="@color/ind_red"
@@ -219,6 +226,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/pylon8"
             android:layout_gravity="center"
             android:text="@string/h_pylon"
             android:textColor="@color/ind_red"

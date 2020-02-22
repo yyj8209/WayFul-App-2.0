@@ -1,0 +1,17 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="tab_left">230dp</dimen>
+    <dimen name="tab_width">320dp</dimen>
+    <dimen name="button_heigth">30dp</dimen>
+    <dimen name="button_width2">50dp</dimen>
+    <dimen name="button_width4">75dp</dimen>
+    <dimen name="button_txtsize">12sp</dimen>
+    <dimen name="viewpaper_width">320dp</dimen>
+    <dimen name="status_width">220dp</dimen>
+    <dimen name="status_heigth">180dp</dimen>
+    <dimen name="pyloncheckbox_width">50dp</dimen>
+    <dimen name="pyloncheckbox_heigth">90dp</dimen>
+    <dimen name="string_size">18sp</dimen>
+</resources>

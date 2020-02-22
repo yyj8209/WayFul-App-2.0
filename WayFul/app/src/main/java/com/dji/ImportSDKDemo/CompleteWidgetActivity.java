@@ -140,6 +140,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 
     // 一共是八个图标，对应八种状态。
     private CheckBox [] cb = new CheckBox[PYLON_NUM];   // 测试复选框显示图片。
+    private TextView [] tvPylon = new TextView[PYLON_NUM];  // 显示弹仓号
     private boolean [] cbChecked = new boolean[PYLON_NUM];   // 判断是否选中。
     private  byte[] dataDown,dataUp,dataDownOld;
     private boolean bSendOrder = true;
@@ -178,6 +179,8 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
     private String[] mItemTexts = new String[] { };
     private int[] mItemImgs = new int[] { };
     private boolean bLightState = false, bBlinkState = false, bShoutState = false;
+
+    private String [] strPylons = new String[]{};
 //            R.drawable.clear, R.drawable.start,
 //            R.drawable.stop, R.drawable.settings };
 
@@ -238,16 +241,9 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
         updateImage(dataDown);    // 初始化和更新挂架状态的显示。2018.10.04
 
         mCircleMenuLayout = (CircleMenuLayout) findViewById(R.id.id_menulayout);
-        mItemTexts = new String[] { getResources().getString( R.string.status_refresh ),
-                getResources().getString( R.string.aim_on), getResources().getString( R.string.pylon_off),
-                getResources().getString( R.string.light_on), getResources().getString( R.string.blink_on),
-                getResources().getString( R.string.shout_on), getResources().getString( R.string.reserved) };
-        mItemImgs = new int[] { R.drawable.downchannel,
-                R.drawable.add, R.drawable.upload,
-                R.drawable.light_off, R.drawable.blink_off,
-                R.drawable.shout_off, R.drawable.settings };
+        initCircleMenuUI( );
         updateCircleMenuUI(true );
-        initCircleMenu( );
+        setCircleMenuFunc( );
 
         mFlightController = GetProductApplication.getFlightControllerInstance();
 //        initTabLayoutView();   // 导航栏初始化。
@@ -255,20 +251,23 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 //        addListener();    // 对添加航线飞行目标点的监视。    2019.2.9
     }
     // 初始化圆形菜单界面
-    private void updateCircleMenuUI(boolean bAdd ){
+    private void initCircleMenuUI( ){
+        mItemTexts = new String[] { getResources().getString( R.string.pylon_refresh ),
+                getResources().getString( R.string.aim_on), getResources().getString( R.string.pylon_off),
+                getResources().getString( R.string.light_on), getResources().getString( R.string.blink_on),
+                getResources().getString( R.string.shout_on)};
+        mItemImgs = new int[] { R.drawable.downchannel,
+                R.drawable.add, R.drawable.upload,
+                R.drawable.light_off, R.drawable.blink_off,
+                R.drawable.shout_off };
+    }
+    // 更新圆形菜单界面
+    private void updateCircleMenuUI(boolean bAdd ){ // 修改了CircleMenujava 中的addItems，使之先删除再添加 2020.02.22
         mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImgs, mItemTexts,bAdd);
-
         Log.e(TAG_COM,"菜单调试：updateCircleMenuUI");
     }
-    // 清除圆形菜单界面
-    private void clearCircleMenuUI( ){
-        int []mItemImg = new int[]{};
-        String []mItemText = new String[]{};
-        mCircleMenuLayout.setMenuItemIconsAndTexts(mItemImg, mItemText,false);
-        Log.e(TAG_COM,"菜单调试：clearCircleMemuUI");
-    }
     // 设置菜单的响应函数
-    private void initCircleMenu( ){
+    private void setCircleMenuFunc( ){
         bSendOrder = true;
         Log.e(TAG_COM,"菜单调试：initCircleMenu 功能响应");
         mCircleMenuLayout.setOnMenuItemClickListener(new OnMenuItemClickListener()
@@ -276,7 +275,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
             @Override
             public void itemClick(View view, int pos)
             {
-// 菜单顺序(pos+1)：1状态更新，2一键瞄准，3弹仓显/隐，4打开/关闭照明，5打开/关闭喊话，6保留
+// 菜单顺序(pos+1)：1状态更新，2一键瞄准，3弹仓显/隐，4打开/关闭照明，5打开/关闭闪光，6打开/关闭喊话
 // ---------------------------- 指令协议 ----------------------------
 //                0X00	无操作	0X04	喊话
 //                0X01	照明	0X05	激活下行链路
@@ -304,12 +303,12 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                         if(View.VISIBLE == findViewById( R.id.status).getVisibility()) {
                             findViewById( R.id.status ).setVisibility( View.INVISIBLE );
                             mItemTexts[2] = getResources().getString(R.string.pylon_on) ;
-                            Log.e(TAG_COM,"菜单调式：隐弹仓");
+                            Log.e(TAG_COM,"菜单调式："+mItemTexts[2]);
                         }
                         else {
                             findViewById( R.id.status ).setVisibility( View.VISIBLE );
                             mItemTexts[2] = getResources().getString(R.string.pylon_off);
-                            Log.e(TAG_COM,"菜单调式：显弹仓");
+                            Log.e(TAG_COM,"菜单调式："+mItemTexts[2]);
                         }
                         bSendOrder = false;
                         break;
@@ -320,7 +319,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                             mItemTexts[3] = getResources().getString(R.string.light_off);
                             mItemImgs[3] = R.drawable.light_on;
                             bLightState = true;
-                            Log.e(TAG_COM,"菜单调式：开照明");
+                            Log.e(TAG_COM,"菜单调式："+mItemTexts[3]);
                         }
                         else{
                             for (int i = 0; i < dataUp.length / 2; i++)
@@ -328,51 +327,44 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                             mItemTexts[3] = getResources().getString(R.string.light_on);
                             mItemImgs[3] = R.drawable.light_off;
                             bLightState = false;
-                            Log.e(TAG_COM,"菜单调式：关照明");
+                            Log.e(TAG_COM,"菜单调式："+mItemTexts[3]);
                         }
                         break;
                     case 5:
                         if(!bBlinkState) {
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X03;   // 闪光
-                            mItemTexts[4] = getResources().getString(R.string.blink_on);
-                            mItemImgs[4] = R.drawable.blink_off;
+                            mItemTexts[4] = getResources().getString(R.string.blink_off);
+                            mItemImgs[4] = R.drawable.blink_on;
                             bBlinkState = true;
-                            Log.e(TAG_COM,"菜单调式：开闪光");
+                            Log.e(TAG_COM,"菜单调式："+mItemTexts[4]);
                         }
                         else{
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X03;   // 关闭闪光
-                            mItemTexts[4] = getResources().getString(R.string.blink_off);
-                            mItemImgs[4] = R.drawable.blink_on;
+                            mItemTexts[4] = getResources().getString(R.string.blink_on);
+                            mItemImgs[4] = R.drawable.blink_off;
                             bBlinkState = false;
-                            Log.e(TAG_COM,"菜单调式：关闪光");
+                            Log.e(TAG_COM,"菜单调式："+mItemTexts[4]);
                         }
                         break;
                     case 6:
                         if(!bShoutState) {
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X04;   // 喊话
-                            mItemTexts[5] = getResources().getString(R.string.shout_on);
-                            mItemImgs[5] = R.drawable.shout_off;
+                            mItemTexts[5] = getResources().getString(R.string.shout_off);
+                            mItemImgs[5] = R.drawable.shout_on;
                             bShoutState = true;
                             Log.e(TAG_COM,"菜单调式：开喊话");
                         }
                         else{
                             for (int i = 0; i < dataUp.length / 2; i++)
                                 dataUp[2 * i + 1] = 0X07;   // 关闭喊话
-                            mItemTexts[5] = getResources().getString(R.string.shout_off);
-                            mItemImgs[5] = R.drawable.shout_on;
+                            mItemTexts[5] = getResources().getString(R.string.shout_on);
+                            mItemImgs[5] = R.drawable.shout_off;
                             bShoutState = false;
                             Log.e(TAG_COM,"菜单调式：关喊话");
                         }
-                        break;
-                    case 7:
-                        Toast.makeText( CompleteWidgetActivity.this, getResources().getString( R.string.reserved ),
-                                Toast.LENGTH_SHORT ).show();
-//                        // 1-无操作，2-照明，3-发射，4-闪光，5-喊话，6-发射，7-激光。
-//                        for (int i = 0; i < dataUp.length / 2; i++)
-//                            dataUp[2 * i + 1] = 0X06;   // 激光
                         break;
                     default:
                         break;
@@ -406,7 +398,6 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
             cbChecked[i] = false;
             cb[i].setOnCheckedChangeListener(this);  // 为每一个复选框设置一个监听函数。
         }
-
         imagePath = new int [] {
                 R.drawable.selector_pylon1,//bomb_empty,
                 R.drawable.selector_pylon2,//bomb_empty_open,
@@ -419,6 +410,31 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                 R.drawable.selector_pylon9,//bomb_stun,
                 R.drawable.selector_pylon10  //bomb_stun_ready,
         };
+
+        tvPylon[0] = (TextView) findViewById( R.id.pylon1 );
+        tvPylon[1] = (TextView) findViewById( R.id.pylon2 );
+        tvPylon[2] = (TextView) findViewById( R.id.pylon3 );
+        tvPylon[3] = (TextView) findViewById( R.id.pylon4 );
+        tvPylon[4] = (TextView) findViewById( R.id.pylon5 );
+        tvPylon[5] = (TextView) findViewById( R.id.pylon6 );
+        tvPylon[6] = (TextView) findViewById( R.id.pylon7 );
+        tvPylon[7] = (TextView) findViewById( R.id.pylon8 );
+
+        strPylons = new String[]{
+                getResources().getString( R.string.a_pylon ),
+                getResources().getString( R.string.b_pylon ),
+                getResources().getString( R.string.c_pylon ),
+                getResources().getString( R.string.d_pylon ),
+                getResources().getString( R.string.e_pylon ),
+                getResources().getString( R.string.f_pylon ),
+                getResources().getString( R.string.g_pylon ),
+                getResources().getString( R.string.h_pylon )
+        };
+
+        for(int i = 0; i < PYLON_NUM; i ++) {
+            tvPylon[i].setText( strPylons[i] );
+        }
+
         // 弹的种类：无弹、烟雾弹、催泪弹、震爆弹，依次用0000，0001，0010，0011表示。
         // 弹的状态：盖关0000、盖开0001。
         dataDown = new byte[]{
@@ -431,7 +447,8 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
                 0X06,0X30,    // 第一字节表示7号挂架，第二字节震爆弹盖关
                 0X07,0X31     // 第一字节表示8号挂架，第二字节震爆弹盖开
         };
-        dataDownOld = new byte[]{0X00,0X00,0X01,0X00,0X02,0X00,0X03,0X00,0X04,0X00,0X05,0X00,0X06,0X00,0X07,0X00};
+        dataDownOld = new byte[]{0X00,0X00,0X01,0X00,0X02,0X00,0X03,
+                0X00,0X04,0X00,0X05,0X00,0X06,0X00,0X07,0X00};
         // 操作命令：无操作0X00、发射准备0X01、发射0X02、取消发射0X03、返回挂架状态0X04。。
         dataUp = new byte[]{
                 0X00,0X00,    // 第一字节表示1号挂架，第二字节无操作
@@ -771,9 +788,8 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
         final AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(CompleteWidgetActivity.this);
         normalDialog.setIcon(R.drawable.alert_icon);
-        normalDialog.setTitle("请取消选择");
-        normalDialog.setMessage("你选择的挂架未装弹，请点击确定按钮取消选择！");
-        normalDialog.setPositiveButton("确定",
+        normalDialog.setMessage(getResources().getString( R.string.pylon_none_bomb ));
+        normalDialog.setPositiveButton(getResources().getString( R.string.ok ),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -916,10 +932,14 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
     // 发射选项，确定需要打开的弹。   2018.7.19
     // 目前，此函数执行发射操作。   2019.01.27
     private void onFireClick(){
-        final String[] hobbies = {"1号挂架："+ bombStatusDisp(dataDown,1), "2号挂架："+bombStatusDisp(dataDown,2),
-                "3号挂架："+bombStatusDisp(dataDown,3), "4号挂架："+bombStatusDisp(dataDown,4),
-                "5号挂架："+bombStatusDisp(dataDown,5), "6号挂架："+bombStatusDisp(dataDown,6),
-                "7号挂架："+bombStatusDisp(dataDown,7), "8号挂架："+bombStatusDisp(dataDown,8) };
+        final String[] hobbies = {strPylons[0]+ bombStatusDisp(dataDown,1),
+                strPylons[1]+bombStatusDisp(dataDown,2),
+                strPylons[2]+bombStatusDisp(dataDown,3),
+                strPylons[3]+bombStatusDisp(dataDown,4),
+                strPylons[4]+bombStatusDisp(dataDown,5),
+                strPylons[5]+bombStatusDisp(dataDown,6),
+                strPylons[6]+bombStatusDisp(dataDown,7),
+                strPylons[7]+bombStatusDisp(dataDown,8) };
         nTemp.clear();
         sTemp.clear();
         for(int i=0;i<cbChecked.length;i++)
@@ -933,7 +953,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 
         AlertDialog.Builder builder = new AlertDialog.Builder( CompleteWidgetActivity.this,R.style.CustomDialogStyle );
         builder.setIcon(R.drawable.alert_icon);
-        builder.setTitle("即将发射");
+        builder.setTitle(getResources().getString( R.string.fire_settings ));
         //    设置一个多项选择下拉框
         String[] s1 = new String[sTemp.size()];   //
         builder.setMultiChoiceItems(sTemp.toArray(s1),null,new DialogInterface.OnMultiChoiceClickListener(){
@@ -941,12 +961,12 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
             public void onClick (DialogInterface dialog,int which, boolean isChecked)
             {
                 if (isChecked) {  // 在这里需要让选中的挂架sTemp，对应到hobbies上，即在操作时，知道对哪个挂架操作。2018.10.30
-                    Toast.makeText( CompleteWidgetActivity.this, nTemp.get(which)+1+" 号即将发射",
-                            Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( CompleteWidgetActivity.this, strPylons[nTemp.get(which)]+" "+
+                                    getResources().getString( R.string.fire_ready ), Toast.LENGTH_SHORT ).show();
                 }
                 else{  // 找到该选项的字符串“*号弹”的起始位置，删除该字符串。2018.07.19
-                    Toast.makeText( CompleteWidgetActivity.this, nTemp.get(which)+1+" 号发射取消",
-                            Toast.LENGTH_SHORT ).show();
+                    Toast.makeText( CompleteWidgetActivity.this, strPylons[nTemp.get(which)]+" "+
+                            getResources().getString( R.string.fire_cancel ),Toast.LENGTH_SHORT ).show();
                 }
                 cbChecked[nTemp.get(which)] = isChecked;
                 cb[nTemp.get(which)].setChecked( isChecked);
@@ -954,7 +974,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
         });
         // 在这里重载确定按钮的函数。目前是按软件发送指令的思路在做。
 //        完成工作：1、生成上传指令；2、上传指令；3、更新主界面中挂架的状态；4、激活发射按钮。
-        builder.setPositiveButton("发射",new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getText( R.string.fire ),new DialogInterface.OnClickListener() {
             @Override
             public void onClick (DialogInterface dialog,int which)
             {
@@ -979,7 +999,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
 //                }
 //            }
 //        });
-        builder.setNegativeButton("取消",new DialogInterface.OnClickListener(){
+        builder.setNegativeButton(getResources().getText( R.string.cancel ),new DialogInterface.OnClickListener(){
             @Override
             public void onClick (DialogInterface dialog, int which)
             { }
@@ -992,54 +1012,25 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
     }
 
     private String bombStatusDisp(byte []data,int k) {
-//        int tmp = 0X00;
-//        for (int i = 0; i < data.length/2; i ++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，
-//        {
-//            tmp = data[2 * i + 1];
-//            if (tmp == 0X00) bomb_type = 0;
-//            else if (tmp >= 0X01 && tmp <= 0X07) bomb_type = 1;
-//            else if (tmp == 0X10) bomb_type = 2;
-//            else if (tmp >= 0X11 && tmp <= 0X17) bomb_type = 3;
-//            else if (tmp == 0X20) bomb_type = 4;
-//            else if (tmp >= 0X21 && tmp <= 0X27) bomb_type = 5;
-//            else if (tmp == 0X30) bomb_type = 6;
-//            else if (tmp >= 0X31 && tmp <= 0X37) bomb_type = 7;
-//            else if (tmp == 0X40) bomb_type = 8;
-//            else if (tmp >= 0X41 && tmp <= 0X47) bomb_type = 9;
-//            else
-//                Toast.makeText( CompleteWidgetActivity.this,
-//                        "返回机载状态错误！", Toast.LENGTH_SHORT ).show();
-//        }
         String bomb_status = "";
         byte[] status = new byte[PYLON_NUM];
         for (int i = 0; i < status.length; i++)
             status[i] = data[2 * i + 1];   // 只取状态位
 
-//        for (int i = 0; i < status.length; i++)    // 奇数位是挂架序号，第二位是状态。 考虑data状态位，status只截取了其状态位。
-//        switch (status[i]>>4)    // 第二位是状态。。
-//        {
-//            case 0X00:                bomb_status = "无  弹  ";                break;  // bomb_empty
-//            case 0X01:                bomb_status = "烟雾弹  ";                break;  // bomb_smoking
-//            case 0X02:                bomb_status = "催泪弹  ";                break;  // bomb_tear
-//            case 0X03:                bomb_status = "震爆弹  ";                break;  // bomb_stun
-//            case 0X04:                bomb_status = "闪光弹  ";                break;  // bomb_stun
-//            default:                  bomb_status = "";
-//        }
         switch (status[k-1])    // 第二位是状态。。
         {
-            case 0X00:                bomb_status = "无  弹  ";                break;  // bomb_empty
-            case 0X01:                bomb_status = "无  弹  ";                break;  // bomb_empty_open
-            case 0X10:                bomb_status = "烟雾弹  ";                break;  // bomb_smoking
-            case 0X11:                bomb_status = "烟雾弹  ";                break;  // bomb_smoking_ready
-            case 0X20:                bomb_status = "催泪弹  ";                break;  // bomb_tear
-            case 0X21:                bomb_status = "催泪弹  ";                break;  // bomb_tear_ready
-            case 0X30:                bomb_status = "震爆弹  ";                break;  // bomb_stun
-            case 0X31:                bomb_status = "震爆弹  ";                break;  // bomb_stun_ready
-            case 0X40:                bomb_status = "闪光弹  ";                break;  // bomb_stun
-            case 0X41:                bomb_status = "闪光弹  ";                break;  // bomb_stun_ready
+            case 0X00:                bomb_status = getResources().getString( R.string.none_bomb ); break;  // bomb_empty
+            case 0X01:                bomb_status = getResources().getString( R.string.none_bomb ); break;  // bomb_empty_open
+            case 0X10:                bomb_status = getResources().getString( R.string.smoke_bomb );break;  // bomb_smoking
+            case 0X11:                bomb_status = getResources().getString( R.string.smoke_bomb );break;  // bomb_smoking_ready
+            case 0X20:                bomb_status = getResources().getString( R.string.tear_bomb ); break;  // bomb_tear
+            case 0X21:                bomb_status = getResources().getString( R.string.tear_bomb ); break;  // bomb_tear_ready
+            case 0X30:                bomb_status = getResources().getString( R.string.stun_bomb ); break;  // bomb_stun
+            case 0X31:                bomb_status = getResources().getString( R.string.stun_bomb ); break;  // bomb_stun_ready
+            case 0X40:                bomb_status = getResources().getString( R.string.flash_bomb );break;  // bomb_stun
+            case 0X41:                bomb_status = getResources().getString( R.string.flash_bomb );break;  // bomb_stun_ready
             default:                  bomb_status = "";
         }
-
     return bomb_status;
 }
 
@@ -1118,8 +1109,8 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
         progressDialog.setProgressStyle( ProgressDialog.STYLE_SPINNER );
         progressDialog.setCancelable( false );
         progressDialog.setIcon( R.drawable.rtk_icon );
-        progressDialog.setTitle("正在激活下行链路。");
-        progressDialog.setMessage( "正在激活，请勿操作……" );
+        progressDialog.setTitle(getResources().getString( R.string.active_title ));
+        progressDialog.setMessage(getResources().getString( R.string.active_hint ));
         progressDialog.show();
 
         new Thread(new Runnable() {
@@ -1536,9 +1527,8 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(CompleteWidgetActivity.this);
         builder.setIcon(R.drawable.ic_drone);
-        builder.setTitle("提示");
-        builder.setMessage("确定退出吗？");
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+        builder.setMessage(getResources().getString( R.string.quit_hint ));
+        builder.setPositiveButton(getResources().getString( R.string.ok ), new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
@@ -1547,7 +1537,7 @@ public class CompleteWidgetActivity extends FragmentActivity  implements Compoun
             }
         });
         //    设置一个NegativeButton
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+        builder.setNegativeButton(getResources().getString( R.string.cancel ), new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)

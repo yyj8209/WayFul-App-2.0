@@ -1,0 +1,35 @@
+<resources>
+    <string name = "app_name">Antiriot Drone</string>
+    <string name="registerring">registerring…</string>
+    <string name="launguage">中文/EN</string>
+    <string name="start">Start</string>
+    <string name="a_pylon">-A-</string>
+    <string name="b_pylon">-B-</string>
+    <string name="c_pylon">-C-</string>
+    <string name="d_pylon">-D-</string>
+    <string name="e_pylon">-E-</string>
+    <string name="f_pylon">-F-</string>
+    <string name="g_pylon">-G-</string>
+    <string name="h_pylon">-H-</string>
+    <string name="status_refresh">Refresh Status</string>
+    <string name="aim_on">Rapid Aim</string>
+    <string name="aim_off">Quit Aim</string>
+    <string name="pylon_on">Pylon On</string>
+    <string name="pylon_off">Pylon Off</string>
+    <string name="light_on">Light On</string>
+    <string name="blink_on">Blink On</string>
+    <string name="shout_on">Shout On</string>
+    <string name="light_off">Light Off</string>
+    <string name="blink_off">Blink Off</string>
+    <string name="shout_off">Shout Off</string>
+    <string name="reserved">Reserved</string>
+    <string name="current_status">Pylon Status</string>
+    <string name="language">English</string>
+    <string name="title_activity_pylons_widget">PylonsWidgetActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="column_name">Name</string>
+    <string name="column_type">Type</string>
+    <string name="column_nullable">Nullable</string>
+    <string name="column_unique">Unique</string>
+    <string name="column_default">Default</string>
+</resources>

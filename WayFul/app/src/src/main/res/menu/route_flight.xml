@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/add_marks"
+        android:title="添加目标点">
+    </item>
+    <item
+        android:id="@+id/upload"
+        android:title="上传目标点">
+    </item>
+    <item
+        android:id="@+id/clear_marks"
+        android:title="清除目标点">
+    </item>
+    <item
+        android:id="@+id/start"
+        android:title="开始航线飞行">
+    </item>
+    <item
+        android:id="@+id/stop"
+        android:title="停止航线飞行">
+    </item>
+    <item
+        android:id="@+id/settings"
+        android:title="参数设置">
+    </item>
+</menu>
